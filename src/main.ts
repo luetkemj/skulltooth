@@ -1,11 +1,10 @@
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import { setupCounter } from './counter'
+import { setupCanvas, getFontSpriteSheet } from "./canvas";
+import "./style.css";
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    canvas is gonna go here 
-  </div>
-`
+document.querySelector<HTMLDivElement>(
+    "#app"
+)!.innerHTML = `<canvas id="canvas"/>`;
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+await setupCanvas(document.querySelector<HTMLCanvasElement>("#canvas")!);
+
+console.log(getFontSpriteSheet())
