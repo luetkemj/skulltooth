@@ -1,10 +1,10 @@
 import { setupCanvas, getFontSpriteSheet } from "./canvas";
 import "./style.css";
 
-document.querySelector<HTMLDivElement>(
-    "#app"
-)!.innerHTML = `<canvas id="canvas"/>`;
+const init = async () => {
+    await setupCanvas(document.querySelector<HTMLCanvasElement>("#canvas")!);
 
-await setupCanvas(document.querySelector<HTMLCanvasElement>("#canvas")!);
+    console.log(getFontSpriteSheet());
+};
 
-console.log(getFontSpriteSheet())
+init()

@@ -21,7 +21,7 @@ export async function setupCanvas(element: HTMLCanvasElement) {
         // resizeTo
     });
 
-    fontSpriteSheet = await Assets.load("/fonts/menlo-bold.json");
+    fontSpriteSheet = await Assets.load("/skulltooth/fonts/menlo-bold.json");
 
     const container: Container = new Container();
     const sprite: Sprite = new Sprite(
