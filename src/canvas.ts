@@ -1,8 +1,8 @@
-import { Application, Assets, Container, Sprite, Spritesheet } from "pixi.js";
-import { menloBoldAlphaMap } from "./sprite-maps/menlo-bold.map";
+import { Application, Assets, Container, Sprite } from "pixi.js";
+import { menloBoldAlphaMap as asciiMap } from "./sprite-maps/menlo-bold.map";
+import { menloBoldHalfAlphaMap as fontMap } from "./sprite-maps/menlo-bold-half.map";
 
 let app: Application;
-let fontSpriteSheet: Spritesheet;
 
 const grid = {
     width: 100,
@@ -18,30 +18,37 @@ export async function setupCanvas(element: HTMLCanvasElement) {
         height: cellWidth * grid.height,
         autoDensity: true,
         resolution: window.devicePixelRatio || 1,
-        // resizeTo
+        // TODO: allow user resizing
+        // resizeTo is a prop that can eventually be used for proper resizing
     });
 
-    fontSpriteSheet = await Assets.load("/skulltooth/fonts/menlo-bold.json");
+    await loadSprites();
 
     const container: Container = new Container();
-    const sprite: Sprite = new Sprite(
-        fontSpriteSheet.textures[menloBoldAlphaMap["@"]]
-    );
+    const texture = await getFontTexture("@");
+    const sprite: Sprite = new Sprite(texture);
 
     container.addChild(sprite);
-
     app.stage.addChild(container);
-
-    console.log(fontSpriteSheet);
-    console.log(app);
-    console.log(menloBoldAlphaMap)
-    // let counter = 0
-    // const setCounter = (count: number) => {
-    //   counter = count
-    //   element.innerHTML = `count is ${counter}`
-    // }
-    // element.addEventListener('click', () => setCounter(counter + 1))
-    // setCounter(0)
 }
 
-export const getFontSpriteSheet = () => fontSpriteSheet;
+const loadSprites = async () => {
+    Assets.add("ascii", "/skulltooth/fonts/menlo-bold.json");
+    Assets.add("font", "/skulltooth/fonts/menlo-bold-half.json");
+    Assets.add("tile", "/skulltooth/tile.png");
+};
+
+const getAsciiTexture = async (char: string) => {
+    const texture = await Assets.load("ascii");
+    return texture.textures[asciiMap[char as keyof typeof asciiMap]];
+};
+
+const getFontTexture = async (char: string) => {
+    const texture = await Assets.load("font");
+    return texture.textures[fontMap[char as keyof typeof fontMap]];
+};
+
+const getTileTexture = async (char: string) => {
+    const texture = await Assets.load("ascii");
+    return texture.textures[asciiMap[char as keyof typeof asciiMap]];
+};
