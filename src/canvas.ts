@@ -163,8 +163,8 @@ export class View {
     // create sprites and store them
     _.times(options.layers, (layer) => {
       _.times(this.height, (y) => {
-        _.times(this.width, (x) => {
-          this._createSprite({
+        _.times(this.width, async (x) => {
+          await this._createSprite({
             char: options.char,
             width: cellWidth,
             height: cellWidth,
