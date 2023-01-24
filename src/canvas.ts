@@ -73,6 +73,19 @@ interface GetTextureOptions {
   char: string;
 }
 
+interface CreateSpriteOptions {
+  char: string;
+  width: number;
+  height: number;
+  halfWidth: Boolean;
+  layer: number;
+  x: number;
+  y: number;
+  tileSet: string;
+  tint: number;
+  alpha: number;
+}
+
 // width,
 // height,
 // halfWidth,
@@ -146,19 +159,22 @@ export class View {
     return getTileTexture();
   };
 
-  _createSprite = ({
-    char,
-    width,
-    height,
-    halfWidth,
-    layer,
-    x,
-    y,
-    tileSet,
-    tint = 0xffffff,
-    alpha = 1,
-  }) => {
-    let sprite = new PIXI.Sprite(this._getTexture({ tileSet, char }));
+  _createSprite = async (opts: CreateSpriteOptions) => {
+    const {
+      char,
+      width,
+      height,
+      halfWidth,
+      layer,
+      x,
+      y,
+      tileSet,
+      tint = 0xffffff,
+      alpha = 1,
+    } = opts;
+
+    const texture = await this._getTexture({ tileSet, char });
+    let sprite = new Sprite(texture);
     sprite.width = halfWidth ? width / 2 : width;
     sprite.height = height;
     sprite.x = halfWidth ? x * (width / 2) : x * width;
