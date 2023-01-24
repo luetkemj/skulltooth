@@ -86,7 +86,38 @@ interface CreateSpriteOptions {
   alpha: number;
 }
 
-// width,
+interface UpdateSprite {
+  char?: string;
+  layer: number;
+  x: number;
+  y: number;
+  tileSet: string;
+  tint: number;
+  alpha: number;
+}
+
+interface UpdateRow {
+  string: string;
+  layer: number;
+  x: number;
+  y: number;
+  tileSet: string;
+  tint: number;
+  alpha: number;
+}
+
+type Layer = {
+  char: string;
+  tint: number;
+  alpha: number;
+  tileSet: string;
+  x: number;
+  y: number;
+};
+
+type LayerMap = { [key: string]: Layer };
+
+// const // width,
 // height,
 // halfWidth,
 // x = 0,
@@ -186,7 +217,7 @@ export class View {
     this.layers[layer].addChild(sprite);
   };
 
-  updateCell = (layerMap) => {
+  updateCell = (layerMap: LayerMap) => {
     Object.keys(layerMap).forEach((layer) => {
       const { char, tint, alpha, tileSet, x, y } = layerMap[layer];
 
@@ -197,27 +228,21 @@ export class View {
         tileSet,
         x,
         y,
-        layer,
+        layer: parseInt(layer),
       });
     });
   };
 
-  updateSprite = ({
-    char = "",
-    layer,
-    x,
-    y,
-    tileSet = "text",
-    tint,
-    alpha,
-  }) => {
+  updateSprite = async (opts: UpdateSprite) => {
+    const { char = "", layer, x, y, tileSet = "text", tint, alpha } = opts;
     const sprite = this.sprites[layer][y][x];
-    sprite.texture = this._getTexture({ tileSet, char });
+    sprite.texture = await this._getTexture({ tileSet, char });
     if (tint) sprite.tint = tint;
     if (alpha) sprite.alpha = alpha;
   };
 
-  updateRow = ({ string, layer, x, y, tileSet, halfWidth, tint, alpha }) => {
+  updateRow = (opts: UpdateRow) => {
+    const { string, layer, x, y, tileSet, tint, alpha } = opts;
     if (string) {
       [...string].forEach((char, index) =>
         this.updateSprite({
@@ -226,7 +251,6 @@ export class View {
           x: x + index,
           y,
           tileSet,
-          halfWidth,
           tint,
           alpha,
         })
@@ -240,7 +264,6 @@ export class View {
           x: x + index,
           y,
           tileSet,
-          halfWidth,
           tint,
           alpha,
         });
