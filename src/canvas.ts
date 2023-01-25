@@ -1,5 +1,12 @@
 import _ from "lodash";
-import { Application, Assets, Container, Sprite, Texture } from "pixi.js";
+import {
+  Application,
+  Assets,
+  Container,
+  Sprite,
+  Spritesheet,
+  Texture,
+} from "pixi.js";
 import { menloBoldAlphaMap as asciiMap } from "./sprite-maps/menlo-bold.map";
 import { menloBoldHalfAlphaMap as fontMap } from "./sprite-maps/menlo-bold-half.map";
 
@@ -13,6 +20,13 @@ const grid = {
 const cellWidth = window.innerWidth / grid.width;
 // const cellHfW = cellWidth / 2;
 
+type Textures = {
+  ascii: Spritesheet;
+  text: Spritesheet;
+  tile: Texture;
+};
+const textures = {} as Textures;
+
 export async function setupCanvas(element: HTMLCanvasElement): Promise<void> {
   app = new Application({
     view: element,
@@ -25,34 +39,26 @@ export async function setupCanvas(element: HTMLCanvasElement): Promise<void> {
   });
 
   await loadSprites();
-
-  const container: Container = new Container();
-  const texture = await getFontTexture("@");
-  const sprite: Sprite = new Sprite(texture);
-
-  container.addChild(sprite);
-  app.stage.addChild(container);
 }
 
-const loadSprites = async (): Promise<void> => {
-  Assets.add("ascii", "/skulltooth/fonts/menlo-bold.json");
-  Assets.add("font", "/skulltooth/fonts/menlo-bold-half.json");
-  Assets.add("tile", "/skulltooth/tile.png");
+export const loadSprites = async (): Promise<Textures> => {
+  textures.ascii = await Assets.load("/skulltooth/fonts/menlo-bold.json");
+  textures.text = await Assets.load("/skulltooth/fonts/menlo-bold-half.json");
+  textures.tile = await Assets.load("/skulltooth/tile.png");
+
+  return textures
 };
 
-const getAsciiTexture = async (char: string): Promise<Texture> => {
-  const texture = await Assets.load("ascii");
-  return texture.textures[asciiMap[char as keyof typeof asciiMap]];
+const getAsciiTexture = (char: string): Texture => {
+  return textures.ascii.textures[asciiMap[char as keyof typeof asciiMap]];
 };
 
-const getFontTexture = async (char: string): Promise<Texture> => {
-  const texture = await Assets.load("font");
-  return texture.textures[fontMap[char as keyof typeof fontMap]];
+const getFontTexture = (char: string): Texture => {
+  return textures.text.textures[fontMap[char as keyof typeof fontMap]];
 };
 
-const getTileTexture = async (): Promise<Texture> => {
-  const texture = await Assets.load("tile");
-  return texture;
+const getTileTexture = (): Texture => {
+  return textures.tile;
 };
 
 interface ViewOptions {
@@ -117,16 +123,6 @@ type Layer = {
 
 type LayerMap = { [key: string]: Layer };
 
-// const // width,
-// height,
-// halfWidth,
-// x = 0,
-// y = 0,
-// char = "",
-// layers = 3,
-// tileSet = "asci",
-// tint = 0xffffff,
-// alpha = 1,
 export class View {
   width;
   height;
@@ -164,7 +160,7 @@ export class View {
     _.times(options.layers, (layer) => {
       _.times(this.height, (y) => {
         _.times(this.width, async (x) => {
-          await this._createSprite({
+          this._createSprite({
             char: options.char,
             width: cellWidth,
             height: cellWidth,
@@ -183,14 +179,14 @@ export class View {
     return this;
   }
 
-  _getTexture = async (opts: GetTextureOptions): Promise<Texture> => {
+  _getTexture = (opts: GetTextureOptions): Texture => {
     const { tileSet, char } = opts;
-    if (tileSet === "asci") return getAsciiTexture(char);
+    if (tileSet === "ascii") return getAsciiTexture(char);
     if (tileSet === "text") return getFontTexture(char);
     return getTileTexture();
   };
 
-  _createSprite = async (opts: CreateSpriteOptions) => {
+  _createSprite = (opts: CreateSpriteOptions) => {
     const {
       char,
       width,
@@ -204,7 +200,7 @@ export class View {
       alpha = 1,
     } = opts;
 
-    const texture = await this._getTexture({ tileSet, char });
+    const texture = this._getTexture({ tileSet, char });
     let sprite = new Sprite(texture);
     sprite.width = halfWidth ? width / 2 : width;
     sprite.height = height;
@@ -236,7 +232,7 @@ export class View {
   updateSprite = async (opts: UpdateSprite) => {
     const { char = "", layer, x, y, tileSet = "text", tint, alpha } = opts;
     const sprite = this.sprites[layer][y][x];
-    sprite.texture = await this._getTexture({ tileSet, char });
+    sprite.texture = this._getTexture({ tileSet, char });
     if (tint) sprite.tint = tint;
     if (alpha) sprite.alpha = alpha;
   };
