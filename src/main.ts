@@ -1,6 +1,8 @@
 import { setupCanvas, View } from "./canvas";
 import "./style.css";
 
+declare const __GIT_HASH__: string
+
 const init = async () => {
   await setupCanvas(document.querySelector<HTMLCanvasElement>("#canvas")!);
 
@@ -67,6 +69,30 @@ const init = async () => {
   });
 
   console.log(view);
+ 
+  // add an initial string or template so we don't have to call updateRow right away.
+  const viewGitHash = new View({
+    width: 13,
+    height: 1,
+    x: 0,
+    y: 43,
+    halfWidth: true,
+    char: " ",
+    layers: 1,
+    tileSet: "text",
+    tint: 0xfff77f,
+    alpha: 1,
+  })
+  
+  viewGitHash.updateRow({
+    string: `TAG: ${__GIT_HASH__}`,
+    layer: 0,
+    x: 0,
+    y: 0,
+    tileSet: "text",
+    tint: 0xffffff,
+    alpha: 1,
+  });
 };
 
 init();
