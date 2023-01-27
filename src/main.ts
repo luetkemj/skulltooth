@@ -29,18 +29,16 @@ const init = async () => {
     x: 0,
     y: 43,
     layers: 2,
-    tileSets: ["tile", "text"],
-    tints: [0xff0077, 0xff77f],
+    tileSets: ["tile", "ascii"],
+    tints: [0xff0077, 0xffffff],
     alphas: [1, 1],
     template: [
+      {},
       {
         string: "TAG: GITHASH",
         layer: 1,
         x: 0,
         y: 0,
-        tileSet: "text",
-        tint: 0xffffff,
-        alpha: 1,
       },
     ],
   });
