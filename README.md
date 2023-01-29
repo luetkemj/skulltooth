@@ -2,7 +2,6 @@ Skulltooth
 
 [play](https://luetkemj.github.io/skulltooth/)
 
-
 - [x] Part 0 - Setting Up
 - [ ] Part 1 - Drawing the ‘@’ symbol and moving it around
 - [ ] Part 2 - The generic Entity, the render functions, and the map
