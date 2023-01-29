@@ -246,6 +246,8 @@ export class View {
                 this.updateRow({ ...rowLayer, layer: layerIndex, y: rowIndex });
             });
         });
+
+        return this
     };
 
     updateRow = (opts: UpdateRow) => {
@@ -265,7 +267,6 @@ export class View {
         const ts = tileSet || this.tileSets[layer];
         if (ts === "tile")
             _.times(this.width, (index) => {
-                console.log(index, this.width);
                 this.updateSprite({
                     layer,
                     x: x || 0 + index,
