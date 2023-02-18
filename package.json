@@ -9,7 +9,7 @@
     "postbuild": "node ./scripts/postbuild.cjs",
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist",
-    "test": "vitest"
+    "test": "vitest --reporter verbose"
   },
   "devDependencies": {
     "chalk": "4.1.2",
