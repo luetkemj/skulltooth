@@ -6,6 +6,7 @@ export type PositionComponent = {
 
 export type Components = {
   position?: PositionComponent;
+  isBlocking?: {};
 };
 
 export type Entity = {

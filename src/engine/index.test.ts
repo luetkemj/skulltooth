@@ -22,6 +22,7 @@ import {
   matchQueryNone,
   removeComponent,
   resetEngine,
+  destroyAllQueries,
 } from "./index";
 
 describe("engine", () => {
@@ -186,6 +187,17 @@ describe("engine", () => {
       expect(queries).toEqual({ positionQuery });
     });
 
+    test("destroyAllQueries should work", () => {
+      const positionQuery = {
+        name: "positionQuery",
+        filters: { all: ["position"], any: [], none: [] },
+        entities: new Set(),
+      };
+      const queries = createQuery(positionQuery.name, positionQuery.filters);
+      destroyAllQueries();
+      expect(getQueries()).toEqual({});
+    });
+
     test("getQueries should work", () => {
       const positionQuery = {
         name: "positionQuery",
@@ -270,21 +282,54 @@ describe("engine", () => {
       createEntity({ wId: "wid1", eId: "eid2" });
       addComponent("eid1", { position: { x: 1, y: 0, z: 0 } });
 
-      const matches = matchQuery('eid1', 'positionQuery')
+      const matches = matchQuery("eid1", "positionQuery");
 
-      expect(matches).toEqual(new Set(['eid1']))
+      expect(matches).toEqual(new Set(["eid1"]));
 
-      removeComponent('eid1', 'position')
+      removeComponent("eid1", "position");
 
-      const matches2 = matchQuery('eid1', 'positionQuery')
+      const matches2 = matchQuery("eid1", "positionQuery");
 
-      expect(matches2).toEqual(new Set([]))
+      expect(matches2).toEqual(new Set([]));
     });
 
     test("matchAllQueries should work", () => {
-        expect(true).toBe(false)
-    });
+      const isBlockingQuery = {
+        name: "isBlockingQuery",
+        filters: { all: [], any: ["isBlocking"], none: [] },
+        entities: new Set(),
+      };
+      const positionQuery = {
+        name: "positionQuery",
+        filters: { all: ["position"], any: [], none: [] },
+        entities: new Set(),
+      };
 
+      createQuery(positionQuery.name, positionQuery.filters);
+      createQuery(isBlockingQuery.name, isBlockingQuery.filters);
+
+      createWorld({ wId: "wid1" });
+      createEntity({ wId: "wid1", eId: "eid1" });
+      createEntity({ wId: "wid1", eId: "eid2" });
+      addComponent("eid1", { position: { x: 1, y: 0, z: 0 } });
+      addComponent("eid1", { isBlocking: {} });
+
+      matchAllQueries("eid1");
+
+      expect(getQueries()).toEqual({
+        positionQuery: {
+          ...positionQuery,
+          entities: new Set(["eid1"]),
+        },
+        isBlockingQuery: {
+          ...isBlockingQuery,
+          entities: new Set(["eid1"]),
+        },
+      });
+    });
+  });
+  test("INTEGRATION", () => {
     // test adding and removing components and letting the queries do their own thing automatic
+    expect(true).toBe(false);
   });
 });

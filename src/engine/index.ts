@@ -94,7 +94,7 @@ export const matchQuery = (eId: EId, queryName: string) => {
 
 export const matchAllQueries = (eId: EId) => {
   const queryNames = Object.keys(queries);
-  queryNames.forEach((queryName) => queryMatches(eId, queryName));
+  queryNames.forEach((queryName) => matchQuery(eId, queryName));
 };
 
 /////////
@@ -174,6 +174,8 @@ export const addComponent = (eId: EId, component: Components) => {
   // add component to entity
   Object.assign(entity.components, component);
 
+  matchAllQueries(eId)
+
   return entity;
 };
 
@@ -182,6 +184,8 @@ export const removeComponent = (eId: EId, componentName: string) => {
   const entity = getEntity(eId);
   // add component to entity
   delete entity.components[componentName];
+
+  matchAllQueries(eId)
 
   return entity;
 };
