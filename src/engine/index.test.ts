@@ -23,6 +23,7 @@ import {
   removeComponent,
   resetEngine,
   destroyAllQueries,
+  getEngineSnapshot,
 } from "./index";
 
 describe("engine", () => {
@@ -279,7 +280,6 @@ describe("engine", () => {
 
       createWorld({ wId: "wid1" });
       createEntity({ wId: "wid1", eId: "eid1" });
-      createEntity({ wId: "wid1", eId: "eid2" });
       addComponent("eid1", { position: { x: 1, y: 0, z: 0 } });
 
       const matches = matchQuery("eid1", "positionQuery");
@@ -310,7 +310,6 @@ describe("engine", () => {
 
       createWorld({ wId: "wid1" });
       createEntity({ wId: "wid1", eId: "eid1" });
-      createEntity({ wId: "wid1", eId: "eid2" });
       addComponent("eid1", { position: { x: 1, y: 0, z: 0 } });
       addComponent("eid1", { isBlocking: {} });
 
@@ -328,8 +327,27 @@ describe("engine", () => {
       });
     });
   });
+
+  // get stringify working so I can test properly against the entire state of the engine
   test("INTEGRATION", () => {
-    // test adding and removing components and letting the queries do their own thing automatic
-    expect(true).toBe(false);
+      createQuery( "positionQuery", { all: ["position"], any: [], none: [] });
+      createQuery( "isBlockingQuery", { all: [], any: ["isBlocking"], none: [] });
+
+      createWorld({ wId: "wid1" });
+      createEntity({ wId: "wid1", eId: "eid1" });
+      createEntity({ wId: "wid1", eId: "eid2" });
+
+      addComponent("eid1", { position: { x: 1, y: 0, z: 0 } });
+      addComponent("eid2", { isBlocking: {} });
+
+      expect (getQuery('positionQuery').entities.has('eid1')).toBe(true)
+      expect (getQuery('isBlockingQuery').entities.has('eid2')).toBe(true)
+
+      removeComponent("eid1", "position");
+      addComponent("eid2", { position: { x: 1, y: 0, z: 0 } });
+
+      expect (getQuery('positionQuery').entities.has('eid1')).toBe(false)
+      expect (getQuery('positionQuery').entities.has('eid2')).toBe(true)
+      expect (getQuery('isBlockingQuery').entities.has('eid2')).toBe(true)
   });
 });

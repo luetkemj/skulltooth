@@ -203,3 +203,14 @@ export const resetEngine = () => {
   destroyAllQueries();
   _id = 0;
 };
+
+export const getEngineSnapshot = () => {
+    const snapshot = {
+        entities,
+        worlds,
+        queries,
+        _id,
+    }
+
+    return snapshot
+}
