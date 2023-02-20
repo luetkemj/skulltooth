@@ -6,6 +6,7 @@ import {
   CreateWorld,
   EId,
   Entity,
+  Entities,
   Filters,
   Query,
   Queries,
@@ -15,7 +16,7 @@ import {
 } from "./index.types";
 
 let _id = 0;
-export const entities = new Map();
+export const entities: Entities = new Map();
 export const systems = {};
 export const worlds: Worlds = {};
 export const queries: Queries = {};
@@ -27,19 +28,16 @@ export const createId = () => ++_id + Math.random().toString(36).slice(2, 10);
 /////////
 export const getQueries = () => queries;
 export const getQuery = (queryName: string) => queries[queryName];
-export const createQuery = (
-  queryName: string,
-  filters: Filters, 
-) => {
-    const query:Query = {
-        name: queryName,
-        filters,
-        entities: new Set()
-    }
+export const createQuery = (queryName: string, filters: Filters) => {
+  const query: Query = {
+    name: queryName,
+    filters,
+    entities: new Set(),
+  };
 
-    queries[queryName] = query
+  queries[queryName] = query;
 
-    return queries
+  return queries;
 };
 
 export const destroyAllQueries = () => {
@@ -89,7 +87,7 @@ export const matchQuery = (eId: EId, queryName: string) => {
     query.entities.delete(eId);
   }
 
-  return query.entities
+  return query.entities;
 };
 
 export const matchAllQueries = (eId: EId) => {
@@ -174,7 +172,7 @@ export const addComponent = (eId: EId, component: Components) => {
   // add component to entity
   Object.assign(entity.components, component);
 
-  matchAllQueries(eId)
+  matchAllQueries(eId);
 
   return entity;
 };
@@ -185,7 +183,7 @@ export const removeComponent = (eId: EId, componentName: string) => {
   // add component to entity
   delete entity.components[componentName];
 
-  matchAllQueries(eId)
+  matchAllQueries(eId);
 
   return entity;
 };
@@ -204,13 +202,38 @@ export const resetEngine = () => {
   _id = 0;
 };
 
-export const getEngineSnapshot = () => {
-    const snapshot = {
-        entities,
-        worlds,
-        queries,
-        _id,
-    }
+export const stringifyEntities = (entities: Entities) => {
+  return JSON.stringify([...entities]);
+};
 
-    return snapshot
-}
+export const parseEntities = (json: any) => {
+  return new Map(JSON.parse(json));
+};
+
+export const stringifyWorlds = (worlds: Worlds) => {
+  const obj: { [key: string]: Array<string> } = {};
+  const wIds = Object.keys(worlds);
+  wIds.forEach((wId) => {
+    obj[wId] = [...worlds[wId]];
+  });
+  return JSON.stringify(obj);
+};
+
+export const parseWorlds = (json: any) => {
+  const data = JSON.parse(json);
+  const worlds = Object.keys(data).reduce((acc: Worlds, key: WId) => {
+    acc[key] = new Set(data[key]);
+    return acc;
+  }, {});
+  return worlds;
+};
+
+export const getEngineSnapshot = () => {
+  const snapshot = {
+    entities: stringifyEntities(entities),
+    worlds: stringifyWorlds(worlds),
+    _id,
+  };
+
+  return snapshot;
+};

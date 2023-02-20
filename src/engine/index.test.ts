@@ -24,6 +24,10 @@ import {
   resetEngine,
   destroyAllQueries,
   getEngineSnapshot,
+  stringifyEntities,
+  parseEntities,
+  stringifyWorlds,
+  parseWorlds,
 } from "./index";
 
 describe("engine", () => {
@@ -194,7 +198,7 @@ describe("engine", () => {
         filters: { all: ["position"], any: [], none: [] },
         entities: new Set(),
       };
-      const queries = createQuery(positionQuery.name, positionQuery.filters);
+      createQuery(positionQuery.name, positionQuery.filters);
       destroyAllQueries();
       expect(getQueries()).toEqual({});
     });
@@ -328,26 +332,83 @@ describe("engine", () => {
     });
   });
 
-  // get stringify working so I can test properly against the entire state of the engine
-  test("INTEGRATION", () => {
-      createQuery( "positionQuery", { all: ["position"], any: [], none: [] });
-      createQuery( "isBlockingQuery", { all: [], any: ["isBlocking"], none: [] });
-
+  describe("SAVE AND LOAD", () => {
+    beforeEach(() => {
       createWorld({ wId: "wid1" });
+      createWorld({ wId: "wid2" });
       createEntity({ wId: "wid1", eId: "eid1" });
-      createEntity({ wId: "wid1", eId: "eid2" });
-
+      createEntity({ wId: "wid2", eId: "eid2" });
       addComponent("eid1", { position: { x: 1, y: 0, z: 0 } });
       addComponent("eid2", { isBlocking: {} });
+    });
 
-      expect (getQuery('positionQuery').entities.has('eid1')).toBe(true)
-      expect (getQuery('isBlockingQuery').entities.has('eid2')).toBe(true)
+    test("stringifyWorlds", () => {
+      const json = stringifyWorlds(getWorlds());
+      expect(json).toEqual(JSON.stringify({ wid1: ["eid1"], wid2: ["eid2"] }));
+    });
 
-      removeComponent("eid1", "position");
-      addComponent("eid2", { position: { x: 1, y: 0, z: 0 } });
+    test("parseWorlds", () => {
+      const worlds = getWorlds();
+      const json = stringifyWorlds(getWorlds());
+      const data = parseWorlds(json);
+      expect(data).toEqual(worlds);
+    });
 
-      expect (getQuery('positionQuery').entities.has('eid1')).toBe(false)
-      expect (getQuery('positionQuery').entities.has('eid2')).toBe(true)
-      expect (getQuery('isBlockingQuery').entities.has('eid2')).toBe(true)
+    test("stringifyEntities", () => {
+      const json = stringifyEntities(getEntities());
+      expect(json).toEqual(
+        JSON.stringify([
+          [
+            "eid1",
+            {
+              id: "eid1",
+              wId: "wid1",
+              components: { position: { x: 1, y: 0, z: 0 } },
+            },
+          ],
+          ["eid2", { id: "eid2", wId: "wid2", components: { isBlocking: {} } }],
+        ])
+      );
+    });
+
+    test("parseEntities", () => {
+      const entities = getEntities();
+      const json = stringifyEntities(getEntities());
+      const data = parseEntities(json);
+      expect(entities).toEqual(data);
+    });
+
+    test("getEngineSnapshot", () => {
+      const snap = getEngineSnapshot();
+      expect(snap).toEqual({
+        entities:
+          '[["eid1",{"id":"eid1","wId":"wid1","components":{"position":{"x":1,"y":0,"z":0}}}],["eid2",{"id":"eid2","wId":"wid2","components":{"isBlocking":{}}}]]',
+        worlds: '{"wid1":["eid1"],"wid2":["eid2"]}',
+        _id: 0,
+      });
+    });
+  });
+
+  // get stringify working so I can test properly against the entire state of the engine
+  test("INTEGRATION", () => {
+    createQuery("positionQuery", { all: ["position"], any: [], none: [] });
+    createQuery("isBlockingQuery", { all: [], any: ["isBlocking"], none: [] });
+
+    createWorld({ wId: "wid1" });
+    createEntity({ wId: "wid1", eId: "eid1" });
+    createEntity({ wId: "wid1", eId: "eid2" });
+
+    addComponent("eid1", { position: { x: 1, y: 0, z: 0 } });
+    addComponent("eid2", { isBlocking: {} });
+
+    expect(getQuery("positionQuery").entities.has("eid1")).toBe(true);
+    expect(getQuery("isBlockingQuery").entities.has("eid2")).toBe(true);
+
+    removeComponent("eid1", "position");
+    addComponent("eid2", { position: { x: 1, y: 0, z: 0 } });
+
+    expect(getQuery("positionQuery").entities.has("eid1")).toBe(false);
+    expect(getQuery("positionQuery").entities.has("eid2")).toBe(true);
+    expect(getQuery("isBlockingQuery").entities.has("eid2")).toBe(true);
   });
 });
