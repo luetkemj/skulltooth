@@ -1,9 +1,17 @@
 import { mean } from "lodash";
 import { setupCanvas, View } from "./canvas";
 import "./style.css";
+import { userInputSystem } from "./systems/userInput.system";
 
-type State = {
+const enum Turn {
+  PLAYER = "PLAYER",
+  WORLD = "WORLD",
+}
+
+export type State = {
   fps: number;
+  turn: Turn;
+  userInput: KeyboardEvent | null;
   views: {
     fps?: View;
   };
@@ -20,6 +28,8 @@ window.skulltooth = window.skulltooth || {};
 
 const state: State = {
   fps: 0,
+  turn: Turn.PLAYER,
+  userInput: null,
   views: {},
 };
 
@@ -75,6 +85,12 @@ const init = async () => {
   }).updateRows([[{ string: "TAG: GITHASH" }]]);
 
   gameLoop();
+
+  document.addEventListener("keydown", (ev) => {
+    setState((state: State) => {
+      state.userInput = ev;
+    });
+  });
 };
 
 let fps = 0;
@@ -84,6 +100,22 @@ let fpsSamples: Array<Number> = [];
 function gameLoop() {
   requestAnimationFrame(gameLoop);
 
+  // systems
+  if (getState().userInput && getState().turn === Turn.PLAYER) {
+    userInputSystem();
+
+    setState((state: State) => {
+      state.turn = Turn.WORLD;
+    });
+  }
+
+  if (getState().turn === Turn.WORLD) {
+    setState((state: State) => {
+      state.turn = Turn.PLAYER;
+    });
+  }
+
+  // Track FPS
   {
     if (!now) {
       now = Date.now();
