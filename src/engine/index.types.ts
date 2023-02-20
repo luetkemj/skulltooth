@@ -15,6 +15,8 @@ export type Entity = {
   components: Components;
 };
 
+export type Entities = Map<EId, Entity>
+
 export type EId = string;
 
 export type Queries = {
