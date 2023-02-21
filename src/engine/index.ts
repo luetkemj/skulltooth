@@ -57,7 +57,6 @@ export const matchQueryAll = (eId: EId, queryName: string) => {
       (componentName: ComponentTypes) => entity.components[componentName]
     );
   }
-  // is this what I want?
   return true;
 };
 

@@ -1,13 +1,21 @@
-export type PositionComponent = {
+type AppearanceComponent = {
+  char: string;
+  tint: number;
+  tileSet: string;
+};
+
+type PositionComponent = {
   x: number;
   y: number;
   z: number;
 };
 export enum ComponentTypes {
-    Position = 'position',
-    IsBlocking = 'isBlocking',
+  Appearance = "appearance",
+  Position = "position",
+  IsBlocking = "isBlocking",
 }
 export type Components = {
+  appearance?: AppearanceComponent;
   position?: PositionComponent;
   isBlocking?: {};
 };
@@ -18,7 +26,7 @@ export type Entity = {
   components: Components;
 };
 
-export type Entities = Map<EId, Entity>
+export type Entities = Map<EId, Entity>;
 
 export type EId = string;
 

@@ -15,6 +15,13 @@ let app: Application;
 const grid = {
     width: 100,
     height: 44,
+
+    map: {
+        width: 74,
+        height: 39,
+        x: 13,
+        y: 3,
+    }
 };
 
 const cellWidth = window.innerWidth / grid.width;

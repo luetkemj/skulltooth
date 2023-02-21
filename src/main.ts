@@ -2,6 +2,8 @@ import { mean } from "lodash";
 import { setupCanvas, View } from "./canvas";
 import "./style.css";
 import { userInputSystem } from "./systems/userInput.system";
+import { createWorld, createQuery } from "./engine";
+import { createPlayer } from "./prefabs/player.prefab";
 
 const enum Turn {
   PLAYER = "PLAYER",
@@ -14,6 +16,7 @@ export type State = {
   userInput: KeyboardEvent | null;
   views: {
     fps?: View;
+    map?: View;
   };
 };
 
@@ -44,6 +47,10 @@ export const getState = (): State => state;
 const init = async () => {
   await setupCanvas(document.querySelector<HTMLCanvasElement>("#canvas")!);
 
+  // this needs to return the ID so it can be stored in state
+  const world = createWorld({wId: '1'})
+  console.log(world)
+
   new View({
     width: 12,
     height: 2,
@@ -58,6 +65,33 @@ const init = async () => {
     [{ tint: 0xff0077 }, { string: "forcecrusher", tint: 0xffffff }],
   ]);
 
+  new View({
+    width: 12,
+    height: 2,
+    x: 0,
+    y: 0,
+    layers: 2,
+    tileSets: ["tile", "text"],
+    tints: [0xffffff, 0xff0077],
+    alphas: [1, 1],
+  }).updateRows([
+    [{}, { string: " skulltooth" }],
+    [{ tint: 0xff0077 }, { string: "forcecrusher", tint: 0xffffff }],
+  ]);
+
+  const mapView = new View({
+    width: 74,
+    height: 39,
+    x: 13,
+    y: 3,
+    layers: 2,
+    tileSets: ["tile","ascii","tile"],
+    tints: [0x222222, 0x222222, 0x000000],
+    alphas: [1, 1, 0],
+  }).updateCell({
+    1: { char: "@", tint: 0xffffff, alpha: 1, tileSet: "ascii", x: 10, y: 10 },
+  });
+
   const fpsView = new View({
     width: 12,
     height: 1,
@@ -65,13 +99,9 @@ const init = async () => {
     y: 42,
     layers: 1,
     tileSets: ["text"],
-    tints: [0xffffff],
+    tints: [0xdddddd],
     alphas: [1],
   }).updateRows([[{ string: "FPS: calc..." }]]);
-
-  setState((state: State) => {
-    state.views.fps = fpsView;
-  });
 
   new View({
     width: 12,
@@ -83,6 +113,11 @@ const init = async () => {
     tints: [0xffffff],
     alphas: [1],
   }).updateRows([[{ string: "TAG: GITHASH" }]]);
+
+  setState((state: State) => {
+    state.views.fps = fpsView;
+    state.views.map = mapView;
+  });
 
   gameLoop();
 
