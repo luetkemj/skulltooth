@@ -3,7 +3,10 @@ export type PositionComponent = {
   y: number;
   z: number;
 };
-
+export enum ComponentTypes {
+    Position = 'position',
+    IsBlocking = 'isBlocking',
+}
 export type Components = {
   position?: PositionComponent;
   isBlocking?: {};

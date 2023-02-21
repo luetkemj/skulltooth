@@ -13,6 +13,7 @@ import {
   WId,
   World,
   Worlds,
+  ComponentTypes,
 } from "./index.types";
 
 let _id = 0;
@@ -49,7 +50,12 @@ export const matchQueryAll = (eId: EId, queryName: string) => {
   const filter = queries[queryName].filters.all;
   if (filter.length) {
     const entity = getEntity(eId);
-    return every(filter, (componentName) => entity.components[componentName]);
+    if (!entity) throw `entity ${eId} does not exist`;
+
+    return every(
+      filter,
+      (componentName: ComponentTypes) => entity.components[componentName]
+    );
   }
   // is this what I want?
   return true;
@@ -59,7 +65,12 @@ export const matchQueryAny = (eId: EId, queryName: string) => {
   const filter = queries[queryName].filters.any;
   if (filter.length) {
     const entity = getEntity(eId);
-    return some(filter, (componentName) => entity.components[componentName]);
+    if (!entity) throw `entity ${eId} does not exist`;
+
+    return some(
+      filter,
+      (componentName: ComponentTypes) => entity.components[componentName]
+    );
   }
   // is this what I want?
   return true;
@@ -69,7 +80,12 @@ export const matchQueryNone = (eId: EId, queryName: string) => {
   const filter = queries[queryName].filters.none;
   if (filter.length) {
     const entity = getEntity(eId);
-    return every(filter, (componentName) => !entity.components[componentName]);
+    if (!entity) throw `entity ${eId} does not exist`;
+
+    return every(
+      filter,
+      (componentName: ComponentTypes) => !entity.components[componentName]
+    );
   }
   // is this what I want?
   return true;
@@ -148,12 +164,14 @@ export const createEntity = ({ eId, wId }: CreateEntity): Entity => {
   return entity;
 };
 
-export const getEntity = (eId: EId) => entities.get(eId);
+export const getEntity = (eId: EId): Entity | undefined => entities.get(eId);
 
 export const getEntities = () => entities;
 
 export const destroyEntity = (eId: EId) => {
   const entity = getEntity(eId);
+  if (!entity) return;
+
   worlds[entity.wId].delete(eId);
   entities.delete(entity.id);
 };
@@ -169,6 +187,7 @@ export const destroyAllEntities = () => {
 export const addComponent = (eId: EId, component: Components) => {
   // get entity
   const entity = getEntity(eId);
+  if (!entity) throw `entity ${eId} does not exist`;
   // add component to entity
   Object.assign(entity.components, component);
 
@@ -177,9 +196,10 @@ export const addComponent = (eId: EId, component: Components) => {
   return entity;
 };
 
-export const removeComponent = (eId: EId, componentName: string) => {
+export const removeComponent = (eId: EId, componentName: ComponentTypes) => {
   // get entity
   const entity = getEntity(eId);
+  if (!entity) throw `entity ${eId} does not exist`;
   // add component to entity
   delete entity.components[componentName];
 

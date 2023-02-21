@@ -29,6 +29,7 @@ import {
   stringifyWorlds,
   parseWorlds,
 } from "./index";
+import { ComponentTypes } from "./index.types";
 
 describe("engine", () => {
   beforeEach(() => {
@@ -171,7 +172,7 @@ describe("engine", () => {
         },
       });
 
-      removeComponent("eid1", "position");
+      removeComponent("eid1", ComponentTypes.Position);
 
       expect(entity).toEqual({
         id: "eid1",
@@ -290,7 +291,7 @@ describe("engine", () => {
 
       expect(matches).toEqual(new Set(["eid1"]));
 
-      removeComponent("eid1", "position");
+      removeComponent("eid1", ComponentTypes.Position);
 
       const matches2 = matchQuery("eid1", "positionQuery");
 
@@ -404,7 +405,7 @@ describe("engine", () => {
     expect(getQuery("positionQuery").entities.has("eid1")).toBe(true);
     expect(getQuery("isBlockingQuery").entities.has("eid2")).toBe(true);
 
-    removeComponent("eid1", "position");
+    removeComponent("eid1", ComponentTypes.Position);
     addComponent("eid2", { position: { x: 1, y: 0, z: 0 } });
 
     expect(getQuery("positionQuery").entities.has("eid1")).toBe(false);
