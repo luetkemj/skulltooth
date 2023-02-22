@@ -2,9 +2,11 @@ import { mean } from "lodash";
 import { setupCanvas, View } from "./canvas";
 import "./style.css";
 import { userInputSystem } from "./systems/userInput.system";
+import { renderSystem } from "./systems/render.system";
 import { createWorld, getEngine } from "./engine";
-import { WId } from './engine/index.types'
+import { WId } from "./engine/index.types";
 import { createPlayer } from "./prefabs/player.prefab";
+import { createQueries } from "./queries";
 
 const enum Turn {
   PLAYER = "PLAYER",
@@ -31,14 +33,14 @@ declare global {
   }
 }
 window.skulltooth = window.skulltooth || {};
-window.skulltooth.getEngine = () => getEngine()
+window.skulltooth.getEngine = () => getEngine();
 
 const state: State = {
   fps: 0,
   turn: Turn.PLAYER,
   userInput: null,
   views: {},
-  wId: '',
+  wId: "",
 };
 
 window.skulltooth.state = state;
@@ -52,14 +54,16 @@ export const getState = (): State => state;
 const init = async () => {
   await setupCanvas(document.querySelector<HTMLCanvasElement>("#canvas")!);
 
-  // this needs to return the ID so it can be stored in state
-  const world = createWorld()
-  setState((state: State) => {
-    state.wId = world.id
-  })
+  const world = createWorld();
 
-  createPlayer(getState().wId)
-  
+  setState((state: State) => {
+    state.wId = world.id;
+  });
+
+  createQueries();
+
+  createPlayer(getState().wId);
+
   new View({
     width: 12,
     height: 2,
@@ -94,7 +98,7 @@ const init = async () => {
     x: 13,
     y: 3,
     layers: 2,
-    tileSets: ["tile","ascii","tile"],
+    tileSets: ["tile", "ascii", "tile"],
     tints: [0x222222, 0x222222, 0x000000],
     alphas: [1, 1, 0],
   }).updateCell({
@@ -147,6 +151,7 @@ function gameLoop() {
   // systems
   if (getState().userInput && getState().turn === Turn.PLAYER) {
     userInputSystem();
+    renderSystem();
 
     setState((state: State) => {
       state.turn = Turn.WORLD;
@@ -154,6 +159,8 @@ function gameLoop() {
   }
 
   if (getState().turn === Turn.WORLD) {
+    renderSystem();
+
     setState((state: State) => {
       state.turn = Turn.PLAYER;
     });

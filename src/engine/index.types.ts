@@ -9,15 +9,19 @@ type PositionComponent = {
   y: number;
   z: number;
 };
+
 export enum ComponentTypes {
   Appearance = "appearance",
-  Position = "position",
   IsBlocking = "isBlocking",
+  IsPlayer = "isPlayer",
+  Position = "position",
 }
+
 export type Components = {
   appearance?: AppearanceComponent;
-  position?: PositionComponent;
   isBlocking?: {};
+  isPlayer?: {};
+  position?: PositionComponent;
 };
 
 export type EId = string;
