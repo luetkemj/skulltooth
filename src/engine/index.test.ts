@@ -28,6 +28,8 @@ import {
   parseEntities,
   stringifyWorlds,
   parseWorlds,
+  getRawEngineSnapshot,
+  getEngineFromSnapshot,
 } from "./index";
 import { ComponentTypes } from "./index.types";
 
@@ -53,15 +55,17 @@ describe("engine", () => {
   describe("WORLD", () => {
     describe("createWorld", () => {
       test("should work", () => {
-        createWorld({ wId: "wid1", world: new Set(["eid1"]) });
-        expect(getWorlds()).toEqual({ wid1: new Set(["eid1"]) });
+        createWorld({ wId: "wid1", eIds: new Set(["eid1"]) });
+        expect(getWorlds()).toEqual({
+          wid1: { id: "wid1", eIds: new Set(["eid1"]) },
+        });
       });
     });
 
     describe("getWorld", () => {
       test("should work", () => {
-        const world = new Set(["eid1"]);
-        createWorld({ wId: "wid1", world });
+        const world = { id: "wid1", eIds: new Set(["eid1"]) };
+        createWorld({ wId: "wid1", eIds: world.eIds });
         expect(getWorld("wid1")).toEqual(world);
       });
     });
@@ -75,7 +79,9 @@ describe("engine", () => {
 
         destroyWorld("wid2");
 
-        expect(getWorlds()).toEqual({ wid1: new Set(["eid1"]) });
+        expect(getWorlds()).toEqual({
+          wid1: { id: "wid1", eIds: new Set(["eid1"]) },
+        });
         expect(getEntity("eid2")).toBe(undefined);
       });
     });
@@ -122,7 +128,10 @@ describe("engine", () => {
 
         destroyEntity("eid1");
 
-        expect(getWorld("wid1")).toEqual(new Set(["eid2"]));
+        expect(getWorld("wid1")).toEqual({
+          id: "wid1",
+          eIds: new Set(["eid2"]),
+        });
         expect(getEntity("eid1")).toBe(undefined);
       });
     });
@@ -137,7 +146,10 @@ describe("engine", () => {
 
         destroyAllEntities();
         expect(getEntities()).toEqual(new Map());
-        expect(getWorlds()).toEqual({ wid1: new Set(), wid2: new Set() });
+        expect(getWorlds()).toEqual({
+          wid1: { id: "wid1", eIds: new Set() },
+          wid2: { id: "wid2", eIds: new Set() },
+        });
       });
     });
   });
@@ -345,7 +357,12 @@ describe("engine", () => {
 
     test("stringifyWorlds", () => {
       const json = stringifyWorlds(getWorlds());
-      expect(json).toEqual(JSON.stringify({ wid1: ["eid1"], wid2: ["eid2"] }));
+      expect(json).toEqual(
+        JSON.stringify({
+          wid1: { id: "wid1", eIds: ["eid1"] },
+          wid2: { id: "wid2", eIds: ["eid2"] },
+        })
+      );
     });
 
     test("parseWorlds", () => {
@@ -379,14 +396,11 @@ describe("engine", () => {
       expect(entities).toEqual(data);
     });
 
-    test("getEngineSnapshot", () => {
+    test("get and restore from snapshot", () => {
+      const rawSnap = getRawEngineSnapshot();
       const snap = getEngineSnapshot();
-      expect(snap).toEqual({
-        entities:
-          '[["eid1",{"id":"eid1","wId":"wid1","components":{"position":{"x":1,"y":0,"z":0}}}],["eid2",{"id":"eid2","wId":"wid2","components":{"isBlocking":{}}}]]',
-        worlds: '{"wid1":["eid1"],"wid2":["eid2"]}',
-        _id: 0,
-      });
+      const restoredEngine = getEngineFromSnapshot(snap);
+      expect(rawSnap).toEqual(restoredEngine);
     });
   });
 

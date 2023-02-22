@@ -2,7 +2,8 @@ import { mean } from "lodash";
 import { setupCanvas, View } from "./canvas";
 import "./style.css";
 import { userInputSystem } from "./systems/userInput.system";
-import { createWorld, createQuery } from "./engine";
+import { createWorld, getEngine } from "./engine";
+import { WId } from './engine/index.types'
 import { createPlayer } from "./prefabs/player.prefab";
 
 const enum Turn {
@@ -14,6 +15,7 @@ export type State = {
   fps: number;
   turn: Turn;
   userInput: KeyboardEvent | null;
+  wId: WId;
   views: {
     fps?: View;
     map?: View;
@@ -24,16 +26,19 @@ declare global {
   interface Window {
     skulltooth: {
       state: State;
+      getEngine: Function;
     };
   }
 }
 window.skulltooth = window.skulltooth || {};
+window.skulltooth.getEngine = () => getEngine()
 
 const state: State = {
   fps: 0,
   turn: Turn.PLAYER,
   userInput: null,
   views: {},
+  wId: '',
 };
 
 window.skulltooth.state = state;
@@ -48,9 +53,13 @@ const init = async () => {
   await setupCanvas(document.querySelector<HTMLCanvasElement>("#canvas")!);
 
   // this needs to return the ID so it can be stored in state
-  const world = createWorld({wId: '1'})
-  console.log(world)
+  const world = createWorld()
+  setState((state: State) => {
+    state.wId = world.id
+  })
 
+  createPlayer(getState().wId)
+  
   new View({
     width: 12,
     height: 2,
