@@ -1,9 +1,10 @@
 import { getState } from "../main";
 import { getEntity, getQuery } from "../engine";
+import { QueryTypes } from "../queries";
 
 export const renderSystem = () => {
-  const isPlayerQuery = getQuery("isPlayerQuery");
-  console.log(isPlayerQuery);
+  const isPlayerQuery = getQuery(QueryTypes.IsPlayer);
+
 
   isPlayerQuery.entities.forEach((eId) => {
     const { map: mapView } = getState().views;
