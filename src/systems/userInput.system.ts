@@ -1,4 +1,5 @@
 import { getEntity, getQuery } from "../engine";
+import { toPosId } from "../grid";
 import { getState, setState, State } from "../main";
 import { QueryTypes } from "../queries";
 
@@ -22,6 +23,11 @@ export const userInputSystem = () => {
         // fireEvent looks across all components on entity for support
         // if support is found, run the function with entity, component, payload
         // a way to encapsulate this somehow...
+
+        // just a POC the following code is junky and should be in an event like system
+        setState(( state: State ) => {
+            state.toRender.add(toPosId(entity.components.position!))
+        })
 
         if (key === 'h' || key === 'ArrowLeft') { entity.components.position.x -= 1}
         if (key === 'j' || key === 'ArrowDown') { entity.components.position.y += 1}

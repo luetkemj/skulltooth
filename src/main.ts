@@ -15,13 +15,14 @@ const enum Turn {
 
 export type State = {
   fps: number;
+  toRender: Set<string>;
   turn: Turn;
   userInput: KeyboardEvent | null;
-  wId: WId;
   views: {
     fps?: View;
     map?: View;
   };
+  wId: WId;
 };
 
 declare global {
@@ -37,6 +38,7 @@ window.skulltooth.getEngine = () => getEngine();
 
 const state: State = {
   fps: 0,
+  toRender: new Set(),
   turn: Turn.PLAYER,
   userInput: null,
   views: {},
