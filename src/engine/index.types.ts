@@ -1,26 +1,38 @@
-export type PositionComponent = {
+type AppearanceComponent = {
+  char: string;
+  tint: number;
+  tileSet: string;
+};
+
+type PositionComponent = {
   x: number;
   y: number;
   z: number;
 };
+
 export enum ComponentTypes {
-    Position = 'position',
-    IsBlocking = 'isBlocking',
+  Appearance = "appearance",
+  IsBlocking = "isBlocking",
+  IsPlayer = "isPlayer",
+  Position = "position",
 }
+
 export type Components = {
-  position?: PositionComponent;
+  appearance?: AppearanceComponent;
   isBlocking?: {};
+  isPlayer?: {};
+  position?: PositionComponent;
 };
-
-export type Entity = {
-  id: EId;
-  wId: WId;
-  components: Components;
-};
-
-export type Entities = Map<EId, Entity>
 
 export type EId = string;
+export type EIds = Set<EId>;
+export type Entity = { id: EId; wId: WId; components: Components };
+export type Entities = Map<EId, Entity>;
+
+export type WId = string;
+export type WIds = Set<WId>;
+export type World = { id: WId; eIds: EIds };
+export type Worlds = { [key: WId]: World };
 
 export type Queries = {
   [key: string]: Query;
@@ -38,12 +50,6 @@ export type Query = {
   entities: Set<EId>;
 };
 
-export type WId = string;
-
-export type World = Set<string>;
-
-export type Worlds = { [key: string]: Set<EId> };
-
 export interface CreateEntity {
   eId?: EId;
   wId: WId;
@@ -51,5 +57,5 @@ export interface CreateEntity {
 
 export interface CreateWorld {
   wId: WId;
-  world?: World;
+  eIds?: EIds;
 }
