@@ -262,7 +262,7 @@ export const getEngineSnapshot = () => {
   return JSON.stringify(snapshot);
 };
 
-export const getEngineFromSnapshot = (snapshot) => {
+export const getEngineFromSnapshot = (snapshot: string) => {
     const {_id, entities, worlds} = JSON.parse(snapshot)
     return {
         entities: parseEntities(entities),
