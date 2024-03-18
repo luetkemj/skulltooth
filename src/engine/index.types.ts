@@ -10,11 +10,18 @@ type PositionComponent = {
   z: number;
 };
 
+type TryMoveComponent = {
+  x: number;
+  y: number;
+  z: number;
+};
+
 export enum ComponentTypes {
   Appearance = "appearance",
   IsBlocking = "isBlocking",
   IsPlayer = "isPlayer",
   Position = "position",
+  TryMove = "tryMove",
 }
 
 export type Components = {
@@ -22,6 +29,7 @@ export type Components = {
   isBlocking?: {};
   isPlayer?: {};
   position?: PositionComponent;
+  tryMove?: TryMoveComponent;
 };
 
 export type EId = string;

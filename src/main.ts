@@ -3,6 +3,7 @@ import { setupCanvas, View } from "./canvas";
 import "./style.css";
 import { userInputSystem } from "./systems/userInput.system";
 import { renderSystem } from "./systems/render.system";
+import { movementSystem } from "./systems/movement.system";
 import { createWorld, getEngine } from "./engine";
 import { WId } from "./engine/index.types";
 import { createPlayer } from "./prefabs/player.prefab";
@@ -89,7 +90,7 @@ const init = async () => {
     tileSets: ["tile", "ascii", "tile"],
     tints: [0x222222, 0x222222, 0x000000],
     alphas: [1, 1, 0],
-  })
+  });
 
   const fpsView = new View({
     width: 12,
@@ -137,6 +138,7 @@ function gameLoop() {
   // systems
   if (getState().userInput && getState().turn === Turn.PLAYER) {
     userInputSystem();
+    movementSystem();
     renderSystem();
 
     setState((state: State) => {
