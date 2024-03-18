@@ -6,7 +6,7 @@ Skulltooth
 - [x] setup
 - [x] engine
 - [x] loop
-- [ ] @
+- [x] @
 - [ ] maps
 - [ ] FOV 
 - [ ] pathfinding
