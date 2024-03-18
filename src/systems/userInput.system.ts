@@ -1,4 +1,4 @@
-import { getEntity, getQuery } from "../engine";
+import { addComponent, getEntity, getQuery } from "../engine";
 import { toPosId } from "../grid";
 import { getState, setState, State } from "../main";
 import { QueryTypes } from "../queries";
@@ -7,9 +7,10 @@ export const userInputSystem = () => {
   const { userInput } = getState();
   const query = getQuery(QueryTypes.IsPlayer);
 
-  if (!userInput) return setState((state: State) => {
-    state.userInput = null;
-  });
+  if (!userInput)
+    return setState((state: State) => {
+      state.userInput = null;
+    });
 
   const { key } = userInput;
 
@@ -17,22 +18,29 @@ export const userInputSystem = () => {
     const entity = getEntity(eId);
 
     if (entity?.components.position) {
-        // Fire an "event" to try move on the entity!
-        // fireEvent('tryMove', eId, { x: -1, y: 0 })
-        // components have an events key with the events they care about
-        // fireEvent looks across all components on entity for support
-        // if support is found, run the function with entity, component, payload
-        // a way to encapsulate this somehow...
+      // ensure the previous location is rerendered.
+      setState((state: State) => {
+        state.toRender.add(toPosId(entity.components.position!));
+      });
 
-        // just a POC the following code is junky and should be in an event like system
-        setState(( state: State ) => {
-            state.toRender.add(toPosId(entity.components.position!))
-        })
+      const { x, y, z } = entity.components.position;
 
-        if (key === 'h' || key === 'ArrowLeft') { entity.components.position.x -= 1}
-        if (key === 'j' || key === 'ArrowDown') { entity.components.position.y += 1}
-        if (key === 'k' || key === 'ArrowUp') { entity.components.position.y -= 1}
-        if (key === 'l' || key === 'ArrowRight') { entity.components.position.x += 1}
+      if (key === "h" || key === "ArrowLeft") {
+        const newPos = { x: x - 1, y, z };
+        addComponent(eId, { tryMove: newPos });
+      }
+      if (key === "j" || key === "ArrowDown") {
+        const newPos = { x, y: y + 1, z };
+        addComponent(eId, { tryMove: newPos });
+      }
+      if (key === "k" || key === "ArrowUp") {
+        const newPos = { x, y: y - 1, z };
+        addComponent(eId, { tryMove: newPos });
+      }
+      if (key === "l" || key === "ArrowRight") {
+        const newPos = { x: x + 1, y, z };
+        addComponent(eId, { tryMove: newPos });
+      }
     }
   });
 

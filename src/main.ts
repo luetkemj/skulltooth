@@ -3,6 +3,7 @@ import { setupCanvas, View } from "./canvas";
 import "./style.css";
 import { userInputSystem } from "./systems/userInput.system";
 import { renderSystem } from "./systems/render.system";
+import { movementSystem } from "./systems/movement.system";
 import { createWorld, getEngine } from "./engine";
 import { WId } from "./engine/index.types";
 import { createPlayer } from "./prefabs/player.prefab";
@@ -39,7 +40,7 @@ window.skulltooth.getEngine = () => getEngine();
 const state: State = {
   fps: 0,
   toRender: new Set(),
-  turn: Turn.PLAYER,
+  turn: Turn.WORLD,
   userInput: null,
   views: {},
   wId: "",
@@ -80,20 +81,6 @@ const init = async () => {
     [{ tint: 0xff0077 }, { string: "forcecrusher", tint: 0xffffff }],
   ]);
 
-  new View({
-    width: 12,
-    height: 2,
-    x: 0,
-    y: 0,
-    layers: 2,
-    tileSets: ["tile", "text"],
-    tints: [0xffffff, 0xff0077],
-    alphas: [1, 1],
-  }).updateRows([
-    [{}, { string: " skulltooth" }],
-    [{ tint: 0xff0077 }, { string: "forcecrusher", tint: 0xffffff }],
-  ]);
-
   const mapView = new View({
     width: 74,
     height: 39,
@@ -103,8 +90,6 @@ const init = async () => {
     tileSets: ["tile", "ascii", "tile"],
     tints: [0x222222, 0x222222, 0x000000],
     alphas: [1, 1, 0],
-  }).updateCell({
-    1: { char: "@", tint: 0xffffff, alpha: 1, tileSet: "ascii", x: 10, y: 10 },
   });
 
   const fpsView = new View({
@@ -153,6 +138,7 @@ function gameLoop() {
   // systems
   if (getState().userInput && getState().turn === Turn.PLAYER) {
     userInputSystem();
+    movementSystem();
     renderSystem();
 
     setState((state: State) => {

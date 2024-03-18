@@ -161,7 +161,7 @@ export class View {
       app.stage.addChild(layer);
     });
 
-    // create three layers of arrays of arrays to store sprites
+    // create n layers of arrays of arrays to store sprites
     _.times(options.layers, () =>
       this.sprites.push(
         Array.from(Array(this.height), () => Array.from(Array(this.width)))
