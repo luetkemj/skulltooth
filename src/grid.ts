@@ -1,3 +1,6 @@
+import _ from 'lodash'
+import { View } from "./canvas";
+
 type PosId = string;
 type Pos = { x: number; y: number; z: number };
 
@@ -163,17 +166,101 @@ export const distance = (pos1: Pos, pos2: Pos): number => {
   return Math.floor(Math.sqrt(x + y));
 };
 
-// todo: how do we get grid in here? It's coming from state... I think...
-// probably should just pass it in as an arg...
-// don't really even need this function TBH - could likely just delete it.
-export const isOnMapEdge = (pos: Pos): boolean => {
-  const { x, y } = pos;
-  const { width, height, x: mapX, y: mapY } = grid.map;
+export const isOnMapEdge = (x: number, y: number, map: View): boolean => {
+  const { width, height, x: mapX, y: mapY } = map;
 
   if (x === mapX) return true; // west edge
   if (y === mapY) return true; // north edge
   if (x === mapX + width - 1) return true; // east edge
   if (y === mapY + height - 1) return true; // south edge
+  return false;
+};
+
+type Point = {
+  x: number;
+  y: number;
+};
+type Points = Array<Point>;
+
+export const CARDINAL = [
+  { x: 0, y: -1 }, // N
+  { x: 1, y: 0 }, // E
+  { x: 0, y: 1 }, // S
+  { x: -1, y: 0 }, // W
+];
+
+export const DIAGONAL = [
+  { x: 1, y: -1 }, // NE
+  { x: 1, y: 1 }, // SE
+  { x: -1, y: 1 }, // SW
+  { x: -1, y: -1 }, // NW
+];
+
+export const getNeighbors = (
+  pos: Pos,
+  dir: string,
+  map: View,
+  asIds: boolean
+): Array<Pos> | Array<string> => {
+  let direction: Points = [];
+  if (dir === "cardinal") direction = [...CARDINAL];
+  if (dir === "diagonal") direction = [...DIAGONAL];
+  if (dir === "all") direction = [...CARDINAL, ...DIAGONAL];
+
+  const neighbors: Array<Pos> = [];
+
+  for (let dir of direction) {
+    let candidate: Pos = {
+      x: pos.x + dir.x,
+      y: pos.y + dir.y,
+      z: pos.z,
+    };
+    if (
+      candidate.x >= 0 &&
+      candidate.x < map.width &&
+      candidate.y >= 0 &&
+      candidate.y < map.height
+    ) {
+      neighbors.push(candidate);
+    }
+  }
+
+  if (asIds) return neighbors.map(toPosId);
+
+  return neighbors;
+};
+
+export const isAtSamePosition = (pos1: Pos, pos2: Pos): boolean => {
+  return pos1.x === pos2.x && pos1.y === pos2.y && pos1.z === pos2.z;
+};
+
+export const isNeighbor = (pos1: Pos, pos2: Pos): boolean => {
+  if (pos1.z !== pos2.z) {
+    return false;
+  }
+
+  const { x: ax, y: ay } = pos1;
+  const { x: bx, y: by } = pos2;
+
+  if (
+    (ax - bx === 1 && ay - by === 0) ||
+    (ax - bx === 0 && ay - by === -1) ||
+    (ax - bx === -1 && ay - by === 0) ||
+    (ax - bx === 0 && ay - by === 1)
+  ) {
+    return true;
+  }
 
   return false;
 };
+
+
+// consider NOT passing View into the get neighbor functions
+// (testing with canvas is a PITA)
+// I can then have a is on map function that accepts the View but has far simpleter logic so I don't have to test it.
+// export const randomNeighbor = (pos: Pos, dir:string ) => {
+//   const direction = _.sample(CARDINAL);
+//   const x = pos.x + direction.x;
+//   const y = pos.y + direction.y;
+//   return { x, y, z: pos.z };
+// };
