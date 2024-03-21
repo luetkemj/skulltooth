@@ -241,7 +241,6 @@ export const getNeighbors = (
     ) {
       neighbors.push(candidate);
     }
-      neighbors.push(candidate);
   }
 
   if (asIds) return neighbors.map(toPosId);

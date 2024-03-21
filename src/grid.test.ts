@@ -3,7 +3,10 @@ import {
   circle,
   diagonalDistance,
   distance,
+  getNeighbors,
   insideCircle,
+  isAtSamePosition,
+  isNeighbor,
   isOnRectEdge,
   lerp,
   lerpPoint,
@@ -371,6 +374,90 @@ describe("grid", () => {
         isOnRectEdge(
           { x: 100, y: 100, z: 1 },
           { width: 10, height: 10, mapX: 9, mapY: 1 }
+        )
+      ).toBeFalsy();
+    });
+  });
+
+  describe("getNeighbors", () => {
+    test("should work when all neighbors are out of bounds", () => {
+      expect(
+        getNeighbors(
+          { x: 100, y: 9, z: 1 },
+          "cardinal",
+          { width: 10, height: 10 },
+          true
+        )
+      ).toEqual([]);
+    });
+
+    test("should work when some neighbors are out of bounds", () => {
+      expect(
+        getNeighbors(
+          { x: 9, y: 9, z: 1 },
+          "cardinal",
+          { width: 10, height: 10 },
+          true
+        )
+      ).toEqual(["9,8,1", "8,9,1"]);
+    });
+
+    test("should work when all neighbors are in bounds", () => {
+      expect(
+        getNeighbors(
+          { x: 5, y: 5, z: 1 },
+          "cardinal",
+          { width: 10, height: 10 },
+          true
+        )
+      ).toEqual(["5,4,1", "6,5,1", "5,6,1", "4,5,1"]);
+    });
+  });
+
+  describe("isAtSamePosition", () => {
+    test("should work when positions are the same", () => {
+      expect(
+        isAtSamePosition(
+          { x: 100, y: 9, z: 1 },
+          { x: 100, y: 9, z: 1 },
+        )
+      ).toBeTruthy();
+    });
+
+    test("should work when positions are not the same", () => {
+      expect(
+        isAtSamePosition(
+          { x: 0, y: 9, z: 0 },
+          { x: 10, y: 9, z: 0 },
+        )
+      ).toBeFalsy();
+    });
+  });
+
+  describe("isNeighbor", () => {
+    test("should work when positions are neighbors", () => {
+      expect(
+        isNeighbor(
+          { x: 9, y: 9, z: 0 },
+          { x: 10, y: 9, z: 0 },
+        )
+      ).toBeTruthy();
+    });
+
+    test("should work when positions are not neighbors", () => {
+      expect(
+        isNeighbor(
+          { x: 0, y: 9, z: 0 },
+          { x: 10, y: 9, z: 0 },
+        )
+      ).toBeFalsy();
+    });
+
+    test("should work when positions are the same", () => {
+      expect(
+        isNeighbor(
+          { x: 100, y: 9, z: 1 },
+          { x: 100, y: 9, z: 1 },
         )
       ).toBeFalsy();
     });
