@@ -1,5 +1,19 @@
 import { describe, test, expect, beforeEach } from "vitest";
-import { circle, insideCircle, toPosId, toPos } from "./grid";
+import {
+  circle,
+  diagonalDistance,
+  distance,
+  insideCircle,
+  isOnRectEdge,
+  lerp,
+  lerpPoint,
+  line,
+  rectangle,
+  rectsIntersect,
+  roundPoint,
+  toPosId,
+  toPos,
+} from "./grid";
 
 describe("grid", () => {
   describe("toPosId", () => {
@@ -70,22 +84,295 @@ describe("grid", () => {
   describe("insideCircle", () => {
     let c;
     const center = { x: 5, y: 5, z: 1 };
-    const radius = 3.5
+    const radius = 3.5;
 
     beforeEach(() => {
       c = circle(center, radius);
     });
 
     test("should return true if candidate is inside circle", () => {
-      expect(insideCircle(center, radius, {x: 4, y: 2, z: 1})).toBeTruthy();
+      expect(insideCircle(center, radius, { x: 4, y: 2, z: 1 })).toBeTruthy();
     });
 
     test("should return false if candidate is outside circle", () => {
-      expect(insideCircle(center, radius, {x: 0, y: 0, z: 1})).toBeFalsy();
+      expect(insideCircle(center, radius, { x: 0, y: 0, z: 1 })).toBeFalsy();
     });
 
     test("should ignore z", () => {
-      expect(insideCircle(center, radius, {x: 4, y: 2, z: 3})).toBeTruthy();
+      expect(insideCircle(center, radius, { x: 4, y: 2, z: 3 })).toBeTruthy();
+    });
+  });
+
+  describe("lerp", () => {
+    test("should work", () => {
+      expect(lerp(0, 1, 0.3)).toBe(0.3);
+      expect(lerp(0, 100, 0.3)).toBe(30);
+      expect(lerp(3, 5, 0.3)).toBe(3.6);
+      expect(lerp(5, 3, 0.3)).toBe(4.4);
+    });
+  });
+
+  describe("lerpPoint", () => {
+    test("should work", () => {
+      expect(
+        lerpPoint({ x: 0, y: 0, z: 1 }, { x: 100, y: 100, z: 1 }, 0.3)
+      ).toEqual({ x: 30, y: 30, z: 1 });
+    });
+  });
+
+  describe("diagonalDistance", () => {
+    test("should work", () => {
+      expect(
+        diagonalDistance({ x: 0, y: 0, z: 1 }, { x: 5, y: 10, z: 1 })
+      ).toEqual(10);
+    });
+  });
+
+  describe("roundPoint", () => {
+    test("should work", () => {
+      expect(roundPoint({ x: 0.6, y: 0.3, z: 1 })).toEqual({
+        x: 1,
+        y: 0.0,
+        z: 1,
+      });
+    });
+  });
+
+  describe("line", () => {
+    test("should work", () => {
+      expect(line({ x: 1, y: 1, z: 1 }, { x: 3, y: 3, z: 1 })).toEqual([
+        {
+          x: 1,
+          y: 1,
+          z: 1,
+        },
+        {
+          x: 2,
+          y: 2,
+          z: 1,
+        },
+        {
+          x: 3,
+          y: 3,
+          z: 1,
+        },
+      ]);
+    });
+  });
+
+  describe("rectangle", () => {
+    test("should work without walls", () => {
+      expect(
+        rectangle(
+          {
+            x: 1,
+            y: 1,
+            z: 1,
+            height: 2,
+            width: 3,
+            hasWalls: false,
+          },
+          { extra: "props" }
+        )
+      ).toEqual({
+        x1: 1,
+        x2: 4,
+        y1: 1,
+        y2: 3,
+        z: 1,
+        width: 3,
+        height: 2,
+        center: {
+          x: 3,
+          y: 2,
+          z: 1,
+        },
+        hasWalls: false,
+        tiles: {
+          "1,1,1": {
+            x: 1,
+            y: 1,
+            z: 1,
+            extra: "props",
+          },
+          "2,1,1": {
+            x: 2,
+            y: 1,
+            z: 1,
+            extra: "props",
+          },
+          "3,1,1": {
+            x: 3,
+            y: 1,
+            z: 1,
+            extra: "props",
+          },
+          "1,2,1": {
+            x: 1,
+            y: 2,
+            z: 1,
+            extra: "props",
+          },
+          "2,2,1": {
+            x: 2,
+            y: 2,
+            z: 1,
+            extra: "props",
+          },
+          "3,2,1": {
+            x: 3,
+            y: 2,
+            z: 1,
+            extra: "props",
+          },
+        },
+      });
+    });
+    test("should work with walls", () => {
+      expect(
+        rectangle(
+          {
+            x: 1,
+            y: 1,
+            z: 1,
+            height: 3,
+            width: 4,
+            hasWalls: true,
+          },
+          { extra: "props" }
+        )
+      ).toEqual({
+        x1: 1,
+        x2: 5,
+        y1: 1,
+        y2: 4,
+        z: 1,
+        center: {
+          x: 3,
+          y: 3,
+          z: 1,
+        },
+        hasWalls: true,
+        tiles: {
+          "2,2,1": {
+            x: 2,
+            y: 2,
+            z: 1,
+            extra: "props",
+          },
+          "3,2,1": {
+            x: 3,
+            y: 2,
+            z: 1,
+            extra: "props",
+          },
+        },
+        width: 4,
+        height: 3,
+      });
+    });
+  });
+
+  describe("rectsIntersect", () => {
+    test("should work when rectangles intersect", () => {
+      const r1 = rectangle(
+        {
+          x: 1,
+          y: 1,
+          z: 1,
+          height: 2,
+          width: 3,
+          hasWalls: false,
+        },
+        { extra: "props" }
+      );
+      const r2 = rectangle(
+        {
+          x: 2,
+          y: 2,
+          z: 1,
+          height: 2,
+          width: 3,
+          hasWalls: false,
+        },
+        { extra: "props" }
+      );
+      expect(rectsIntersect(r1, r2)).toBeTruthy();
+    });
+
+    test("should work when rectangles do not intersect", () => {
+      const r1 = rectangle(
+        {
+          x: 1,
+          y: 1,
+          z: 1,
+          height: 2,
+          width: 3,
+          hasWalls: false,
+        },
+        { extra: "props" }
+      );
+      const r2 = rectangle(
+        {
+          x: 5,
+          y: 5,
+          z: 1,
+          height: 2,
+          width: 3,
+          hasWalls: false,
+        },
+        { extra: "props" }
+      );
+      expect(rectsIntersect(r1, r2)).toBeFalsy();
+    });
+  });
+
+  describe("distance", () => {
+    test("should work", () => {
+      expect(distance({ x: 1, y: 1, z: 1 }, { x: 5, y: 15, z: 1 })).toBe(14);
+    });
+  });
+
+  describe("isOnRectEdge", () => {
+    test("should work when on north edge", () => {
+      expect(
+        isOnRectEdge(
+          { x: 100, y: 9, z: 1 },
+          { width: 10, height: 10, mapX: 1, mapY: 9 }
+        )
+      ).toBeTruthy();
+    });
+    test("should work when on south edge", () => {
+      expect(
+        isOnRectEdge(
+          { x: 100, y: 19, z: 1 },
+          { width: 10, height: 10, mapX: 9, mapY: 10 }
+        )
+      ).toBeTruthy();
+    });
+    test("should work when on east edge", () => {
+      expect(
+        isOnRectEdge(
+          { x: 18, y: 100, z: 1 },
+          { width: 10, height: 10, mapX: 9, mapY: 1 }
+        )
+      ).toBeTruthy();
+    });
+    test("should work when on west edge", () => {
+      expect(
+        isOnRectEdge(
+          { x: 9, y: 100, z: 1 },
+          { width: 10, height: 10, mapX: 9, mapY: 1 }
+        )
+      ).toBeTruthy();
+    });
+    test("should work when not on edge", () => {
+      expect(
+        isOnRectEdge(
+          { x: 100, y: 100, z: 1 },
+          { width: 10, height: 10, mapX: 9, mapY: 1 }
+        )
+      ).toBeFalsy();
     });
   });
 });

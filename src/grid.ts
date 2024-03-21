@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _ from "lodash";
 import { View } from "./canvas";
 
 type PosId = string;
@@ -69,13 +69,13 @@ export const lerpPoint = (pos0: Pos, pos1: Pos, t: number): Pos => {
   return { x, y, z };
 };
 
-const diagonalDistance = (pos0: Pos, pos1: Pos): number => {
+export const diagonalDistance = (pos0: Pos, pos1: Pos): number => {
   const dx = pos1.x - pos0.x;
   const dy = pos1.y - pos0.y;
   return Math.max(Math.abs(dx), Math.abs(dy));
 };
 
-const roundPoint = (pos: Pos) => {
+export const roundPoint = (pos: Pos) => {
   const x = Math.round(pos.x);
   const y = Math.round(pos.y);
   const z = pos.z;
@@ -84,13 +84,13 @@ const roundPoint = (pos: Pos) => {
 };
 
 export const line = (pos0: Pos, pos1: Pos): Array<Pos> => {
-  let points = [];
+  let positions = [];
   let N = diagonalDistance(pos0, pos1);
   for (let step = 0; step <= N; step++) {
     let t = N === 0 ? 0.0 : step / N;
-    points.push(roundPoint(lerpPoint(pos0, pos1, t)));
+    positions.push(roundPoint(lerpPoint(pos0, pos1, t)));
   }
-  return points;
+  return positions;
 };
 
 type Tile = { x: number; y: number; z: number; [key: string]: any };
@@ -104,6 +104,8 @@ type Rectangle = {
   center: Pos;
   hasWalls: boolean;
   tiles: Tiles;
+  width: number;
+  height: number;
 };
 
 interface RectangleProps {
@@ -148,7 +150,7 @@ export const rectangle = (
     z,
   };
 
-  return { x1, x2, y1, y2, z, center, hasWalls, tiles };
+  return { x1, x2, y1, y2, z, center, hasWalls, tiles, width, height };
 };
 
 export const rectsIntersect = (rect1: Rectangle, rect2: Rectangle): boolean => {
@@ -166,13 +168,24 @@ export const distance = (pos1: Pos, pos2: Pos): number => {
   return Math.floor(Math.sqrt(x + y));
 };
 
-export const isOnMapEdge = (x: number, y: number, map: View): boolean => {
-  const { width, height, x: mapX, y: mapY } = map;
+type RectDimensions = {
+  width: number;
+  height: number;
+  mapX: number;
+  mapY: number;
+};
 
-  if (x === mapX) return true; // west edge
-  if (y === mapY) return true; // north edge
-  if (x === mapX + width - 1) return true; // east edge
-  if (y === mapY + height - 1) return true; // south edge
+export const isOnRectEdge = (
+  pos: Pos,
+  rectDimensions: RectDimensions
+): boolean => {
+  const { width, height, mapX, mapY } = rectDimensions;
+
+  if (pos.x === mapX) return true; // west edge
+  if (pos.y === mapY) return true; // north edge
+  if (pos.x === mapX + width - 1) return true; // east edge
+  if (pos.y === mapY + height - 1) return true; // south edge
+
   return false;
 };
 
@@ -196,10 +209,15 @@ export const DIAGONAL = [
   { x: -1, y: -1 }, // NW
 ];
 
+type Dimensions = {
+  width: number,
+  height: number,
+}
+
 export const getNeighbors = (
   pos: Pos,
   dir: string,
-  map: View,
+  boundary: Dimensions,
   asIds: boolean
 ): Array<Pos> | Array<string> => {
   let direction: Points = [];
@@ -217,12 +235,13 @@ export const getNeighbors = (
     };
     if (
       candidate.x >= 0 &&
-      candidate.x < map.width &&
+      candidate.x < boundary.width &&
       candidate.y >= 0 &&
-      candidate.y < map.height
+      candidate.y < boundary.height
     ) {
       neighbors.push(candidate);
     }
+      neighbors.push(candidate);
   }
 
   if (asIds) return neighbors.map(toPosId);
@@ -254,13 +273,3 @@ export const isNeighbor = (pos1: Pos, pos2: Pos): boolean => {
   return false;
 };
 
-
-// consider NOT passing View into the get neighbor functions
-// (testing with canvas is a PITA)
-// I can then have a is on map function that accepts the View but has far simpleter logic so I don't have to test it.
-// export const randomNeighbor = (pos: Pos, dir:string ) => {
-//   const direction = _.sample(CARDINAL);
-//   const x = pos.x + direction.x;
-//   const y = pos.y + direction.y;
-//   return { x, y, z: pos.z };
-// };
