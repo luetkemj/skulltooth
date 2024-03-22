@@ -128,6 +128,8 @@ type Layer = {
 type LayerMap = { [key: string]: Layer };
 
 export class View {
+  x: number = 0;
+  y: number = 0;
   halfWidth: Boolean = false;
   width;
   height;
