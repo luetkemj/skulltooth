@@ -3,6 +3,8 @@ import {
   circle,
   diagonalDistance,
   distance,
+  getDirection,
+  getNeighbor,
   getNeighbors,
   insideCircle,
   isAtSamePosition,
@@ -11,11 +13,13 @@ import {
   lerp,
   lerpPoint,
   line,
+  randomNeighbor,
   rectangle,
   rectsIntersect,
   roundPoint,
   toPosId,
   toPos,
+  getVelocity,
 } from "./grid";
 
 describe("grid", () => {
@@ -417,19 +421,13 @@ describe("grid", () => {
   describe("isAtSamePosition", () => {
     test("should work when positions are the same", () => {
       expect(
-        isAtSamePosition(
-          { x: 100, y: 9, z: 1 },
-          { x: 100, y: 9, z: 1 },
-        )
+        isAtSamePosition({ x: 100, y: 9, z: 1 }, { x: 100, y: 9, z: 1 })
       ).toBeTruthy();
     });
 
     test("should work when positions are not the same", () => {
       expect(
-        isAtSamePosition(
-          { x: 0, y: 9, z: 0 },
-          { x: 10, y: 9, z: 0 },
-        )
+        isAtSamePosition({ x: 0, y: 9, z: 0 }, { x: 10, y: 9, z: 0 })
       ).toBeFalsy();
     });
   });
@@ -437,29 +435,111 @@ describe("grid", () => {
   describe("isNeighbor", () => {
     test("should work when positions are neighbors", () => {
       expect(
-        isNeighbor(
-          { x: 9, y: 9, z: 0 },
-          { x: 10, y: 9, z: 0 },
-        )
+        isNeighbor({ x: 9, y: 9, z: 0 }, { x: 10, y: 9, z: 0 })
       ).toBeTruthy();
     });
 
     test("should work when positions are not neighbors", () => {
       expect(
-        isNeighbor(
-          { x: 0, y: 9, z: 0 },
-          { x: 10, y: 9, z: 0 },
-        )
+        isNeighbor({ x: 0, y: 9, z: 0 }, { x: 10, y: 9, z: 0 })
       ).toBeFalsy();
     });
 
     test("should work when positions are the same", () => {
       expect(
-        isNeighbor(
-          { x: 100, y: 9, z: 1 },
-          { x: 100, y: 9, z: 1 },
-        )
+        isNeighbor({ x: 100, y: 9, z: 1 }, { x: 100, y: 9, z: 1 })
       ).toBeFalsy();
+    });
+  });
+
+  describe("randomNeighbor", () => {
+    test("should work", () => {
+      const pos = { x: 1, y: 1, z: 1 };
+      const ran = randomNeighbor(pos);
+      const dist = distance(pos, ran);
+      expect(dist).toBe(1);
+    });
+  });
+
+  describe("getNeighbor", () => {
+    const pos = { x: 1, y: 1, z: 1 };
+
+    test("should work N", () => {
+      const n = getNeighbor(pos, "N");
+      expect(n).toEqual({ x: 1, y: 0, z: 1 });
+    });
+    test("should work E", () => {
+      const n = getNeighbor(pos, "E");
+      expect(n).toEqual({ x: 2, y: 1, z: 1 });
+    });
+    test("should work S", () => {
+      const n = getNeighbor(pos, "S");
+      expect(n).toEqual({ x: 1, y: 2, z: 1 });
+    });
+    test("should work W", () => {
+      const n = getNeighbor(pos, "W");
+      expect(n).toEqual({ x: 0, y: 1, z: 1 });
+    });
+    test("should work NE", () => {
+      const n = getNeighbor(pos, "NE");
+      expect(n).toEqual({ x: 2, y: 0, z: 1 });
+    });
+    test("should work NW", () => {
+      const n = getNeighbor(pos, "NW");
+      expect(n).toEqual({ x: 0, y: 0, z: 1 });
+    });
+    test("should work SE", () => {
+      const n = getNeighbor(pos, "SE");
+      expect(n).toEqual({ x: 2, y: 2, z: 1 });
+    });
+    test("should work SW", () => {
+      const n = getNeighbor(pos, "SW");
+      expect(n).toEqual({ x: 0, y: 2, z: 1 });
+    });
+  });
+
+  describe("getDirection", () => {
+    const pos = { x: 1, y: 1, z: 1 };
+
+    test("should work N", () => {
+      const dir = getDirection({ x: 1, y: 0, z: 1 }, pos);
+      expect(dir).toEqual({ dir: "N", x: 0, y: -1 });
+    });
+    test("should work E", () => {
+      const dir = getDirection({ x: 2, y: 1, z: 1 }, pos);
+      expect(dir).toEqual({ dir: "E", x: 1, y: 0 });
+    });
+    test("should work S", () => {
+      const dir = getDirection({ x: 1, y: 2, z: 1 }, pos);
+      expect(dir).toEqual({ dir: "S", x: 0, y: 1 });
+    });
+    test("should work W", () => {
+      const dir = getDirection({ x: 0, y: 1, z: 1 }, pos);
+      expect(dir).toEqual({ dir: "W", x: -1, y: 0 });
+    });
+    test("should work NE", () => {
+      const dir = getDirection({ x: 2, y: 0, z: 1 }, pos);
+      expect(dir).toEqual({ dir: "NE", x: 1, y: -1 });
+    });
+    test("should work NW", () => {
+      const dir = getDirection({ x: 0, y: 0, z: 1 }, pos);
+      expect(dir).toEqual({ dir: "NW", x: -1, y: -1 });
+    });
+    test("should work SE", () => {
+      const dir = getDirection({ x: 2, y: 2, z: 1 }, pos);
+      expect(dir).toEqual({ dir: "SE", x: 1, y: 1 });
+    });
+    test("should work SW", () => {
+      const dir = getDirection({ x: 0, y: 2, z: 1 }, pos);
+      expect(dir).toEqual({ dir: "SW", x: -1, y: 1 });
+    });
+  });
+
+  describe("getVelocity", () => {
+    test("should work", () => {
+      const posA = { x: 0, y: 0, z: 1 };
+      const posB = { x: 1, y: 1, z: 1 };
+      expect(getVelocity(posA, posB)).toEqual({ x: -1, y: -1 });
     });
   });
 });

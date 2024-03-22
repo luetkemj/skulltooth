@@ -1,5 +1,4 @@
 import _ from "lodash";
-import { View } from "./canvas";
 
 type PosId = string;
 type Pos = { x: number; y: number; z: number };
@@ -209,10 +208,12 @@ export const DIAGONAL = [
   { x: -1, y: -1 }, // NW
 ];
 
+export const ALL = [...CARDINAL, ...DIAGONAL];
+
 type Dimensions = {
-  width: number,
-  height: number,
-}
+  width: number;
+  height: number;
+};
 
 export const getNeighbors = (
   pos: Pos,
@@ -272,3 +273,59 @@ export const isNeighbor = (pos1: Pos, pos2: Pos): boolean => {
   return false;
 };
 
+export const randomNeighbor = (pos: Pos): Pos => {
+  const direction = _.sample(CARDINAL);
+  const x = pos.x + direction!.x;
+  const y = pos.y + direction!.y;
+  return { x, y, z: pos.z };
+};
+
+type DirMap = { [key: string]: number };
+
+export const getNeighbor = (pos: Pos, dir: string): Pos => {
+  const dirMap: DirMap = { N: 0, E: 1, S: 2, W: 3, NE: 4, SE: 5, SW: 6, NW: 7 };
+  const direction = ALL[dirMap[dir]];
+  return {
+    x: pos.x + direction.x,
+    y: pos.y + direction.y,
+    z: pos.z,
+  };
+};
+
+type Direction = {
+  dir: string;
+  x: number;
+  y: number;
+};
+
+export const getDirection = (posA: Pos, posB: Pos):Direction => {
+  const { x: ax, y: ay } = posA;
+  const { x: bx, y: by } = posB;
+
+  let dir = '';
+
+  if (ax - bx === -1 && ay - by === -1) dir = "NW";
+  if (ax - bx === 1 && ay - by === -1) dir = "NE";
+  if (ax - bx === 1 && ay - by === 1) dir = "SE";
+  if (ax - bx === -1 && ay - by === 1) dir = "SW";
+
+  if (ax - bx === 1 && ay - by === 0) dir = "E";
+  if (ax - bx === 0 && ay - by === -1) dir = "N";
+  if (ax - bx === -1 && ay - by === 0) dir = "W";
+  if (ax - bx === 0 && ay - by === 1) dir = "S";
+
+  if (ax - bx === 0 && ay - by === 0) dir = "X";
+
+  return { dir, x: ax - bx, y: ay - by };
+};
+
+// is this right? wonder if maybe it should be reversed...
+// you go from point a to point b... right?
+export const getVelocity = (posA:Pos, posB:Pos):Point => {
+  const { x: ax, y: ay } = posA;
+  const { x: bx, y: by } = posB;
+
+  const velocity = { x: ax - bx, y: ay - by };
+
+  return velocity;
+};
