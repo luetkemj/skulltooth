@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach } from "vitest";
+import { describe, test, expect } from "vitest";
 import {
   circle,
   diagonalDistance,
@@ -89,13 +89,8 @@ describe("grid", () => {
   });
 
   describe("insideCircle", () => {
-    let c;
     const center = { x: 5, y: 5, z: 1 };
     const radius = 3.5;
-
-    beforeEach(() => {
-      c = circle(center, radius);
-    });
 
     test("should return true if candidate is inside circle", () => {
       expect(insideCircle(center, radius, { x: 4, y: 2, z: 1 })).toBeTruthy();

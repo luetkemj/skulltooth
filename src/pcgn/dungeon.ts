@@ -1,9 +1,9 @@
-import { each, random, times } from "lodash";
+import { random, times } from "lodash";
 import {
   type Pos,
   type PosId,
   type Rectangle,
-  line,
+  // line,
   rectangle,
   rectsIntersect,
   toPosId,
