@@ -1,7 +1,7 @@
 import _ from "lodash";
 
-type PosId = string;
-type Pos = { x: number; y: number; z: number };
+export type PosId = string;
+export type Pos = { x: number; y: number; z: number };
 
 export const toPosId = (pos: Pos): PosId => {
   return `${pos.x},${pos.y},${pos.z}`;
@@ -94,7 +94,7 @@ export const line = (pos0: Pos, pos1: Pos): Array<Pos> => {
 
 type Tile = { x: number; y: number; z: number; [key: string]: any };
 type Tiles = { [key: string]: Tile };
-type Rectangle = {
+export type Rectangle = {
   x1: number;
   x2: number;
   y1: number;

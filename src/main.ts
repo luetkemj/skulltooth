@@ -8,6 +8,7 @@ import { createWorld, getEngine } from "./engine";
 import { WId } from "./engine/index.types";
 import { createPlayer } from "./prefabs/player.prefab";
 import { createQueries } from "./queries";
+import { generateDungeon } from "./pcgn/dungeon";
 
 const enum Turn {
   PLAYER = "PLAYER",
@@ -66,6 +67,8 @@ const init = async () => {
   createQueries();
 
   createPlayer(getState().wId);
+
+  generateDungeon();
 
   new View({
     width: 12,
