@@ -5,17 +5,21 @@ import { userInputSystem } from "./systems/userInput.system";
 import { renderSystem } from "./systems/render.system";
 import { movementSystem } from "./systems/movement.system";
 import { createWorld, getEngine } from "./engine";
-import { WId } from "./engine/index.types";
+import { WId, EIds, Entity } from "./engine/index.types";
 import { createPlayer } from "./prefabs/player.prefab";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
+import { toPosId } from "./grid";
 
 const enum Turn {
   PLAYER = "PLAYER",
   WORLD = "WORLD",
 }
 
+type EAP = { [key: string]: EIds };
+
 export type State = {
+  eAP: EAP;
   fps: number;
   toRender: Set<string>;
   turn: Turn;
@@ -39,6 +43,7 @@ window.skulltooth = window.skulltooth || {};
 window.skulltooth.getEngine = () => getEngine();
 
 const state: State = {
+  eAP: {},
   fps: 0,
   toRender: new Set(),
   turn: Turn.WORLD,
@@ -55,6 +60,31 @@ export const setState = (callback: Function): void => {
 
 export const getState = (): State => state;
 
+export const addEAP = (entity: Entity): State => {
+  if (entity.components.position) {
+    const posId = toPosId(entity.components.position);
+    if (state.eAP[posId]) {
+      state.eAP[posId].add(entity.id);
+    } else {
+      state.eAP[posId] = new Set();
+      state.eAP[posId].add(entity.id);
+    }
+  }
+
+  return state;
+};
+
+export const removeEAP = (entity: Entity): State => {
+  if (entity.components.position) {
+    const posId = toPosId(entity.components.position);
+    if (state.eAP[posId]) {
+      state.eAP[posId].delete(entity.id);
+    }
+  }
+
+  return state;
+};
+
 const init = async () => {
   await setupCanvas(document.querySelector<HTMLCanvasElement>("#canvas")!);
 
@@ -65,10 +95,11 @@ const init = async () => {
   });
 
   createQueries();
+  const dungeon = generateDungeon();
+  const startingPosition = dungeon!.rooms[0].center
 
-  createPlayer(getState().wId);
+  createPlayer(getState().wId, startingPosition);
 
-  generateDungeon();
 
   new View({
     width: 12,

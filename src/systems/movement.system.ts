@@ -1,5 +1,6 @@
 import { getEntity, getQuery } from "../engine";
-import { getState } from "../main";
+import { toPosId } from "../grid";
+import { getState, addEAP, removeEAP } from "../main";
 import { QueryTypes } from "../queries";
 
 export const movementSystem = () => {
@@ -15,11 +16,26 @@ export const movementSystem = () => {
     const { width, height } = getState().views.map!;
     if (x < 0 || y < 0 || x >= width || y >= height) return;
 
+    // check entities at goal position
+    const posId = toPosId(entity.components.tryMove!)
+    const eAP = getState().eAP[posId]
+
+    for (const eId of eAP) {
+      if (getEntity(eId)?.components.isBlocking) {
+        return console.log('you can go no further')
+      }
+    }
+
     // if everything checks out - update position
     // should we set this new location to toRender in state?
     // pretty sure - looks like we're just hacking the render system for now
+    
+    removeEAP(entity)
+
     entity.components.position!.x = x;
     entity.components.position!.y = y;
     entity.components.position!.z = z;
+
+    addEAP(entity)
   });
 };

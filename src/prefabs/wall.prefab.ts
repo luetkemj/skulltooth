@@ -10,5 +10,6 @@ export const createWall = (wId: WId) => {
       tileSet: "ascii",
     },
     position: { x: 0, y: 0, z: 0 },
+    isBlocking: {},
   });
 };

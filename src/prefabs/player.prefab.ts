@@ -1,7 +1,9 @@
 import { addComponent, createEntity } from "../engine";
 import { WId } from "../engine/index.types";
+import { addEAP } from "../main";
+import { Pos } from "../grid";
 
-export const createPlayer = (wId: WId) => {
+export const createPlayer = (wId: WId, position: Pos) => {
   const entity = createEntity({ wId });
   addComponent(entity.id, {
     appearance: {
@@ -10,6 +12,7 @@ export const createPlayer = (wId: WId) => {
       tileSet: "ascii",
     },
     isPlayer: {},
-    position: { x: 0, y: 0, z: 0 },
+    position, 
   });
+  addEAP(entity);
 };

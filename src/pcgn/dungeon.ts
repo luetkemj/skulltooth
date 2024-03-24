@@ -8,7 +8,7 @@ import {
   rectsIntersect,
   toPosId,
 } from "../grid";
-import { getState } from "../main";
+import { getState, addEAP } from "../main";
 import { createWall } from "../prefabs/wall.prefab";
 import { createFloor } from "../prefabs/floor.prefab";
 
@@ -60,7 +60,9 @@ type DungeonProps = {
   maxRoomCount: number;
 };
 
-export const buildDungeon = (props: DungeonProps) => {
+type Dungeon = Rectangle & { rooms: Array<Rectangle> };
+
+export const buildDungeon = (props: DungeonProps): Dungeon => {
   const {
     pos,
     width,
@@ -73,16 +75,18 @@ export const buildDungeon = (props: DungeonProps) => {
   const { x, y, z } = pos;
 
   // fill the entire space with walls so we can dig it out later
-  const dungeon = rectangle(
-    { x, y, z, width, height, hasWalls: false },
-    {
-      sprite: "WALL",
-    }
-  );
+  const dungeon: Dungeon = {
+    ...rectangle(
+      { x, y, z, width, height, hasWalls: false },
+      {
+        sprite: "WALL",
+      }
+    ),
+    rooms: [],
+  };
 
   // create room
 
-  const rooms: Array<Rectangle> = [];
   let roomTiles = {};
 
   times(maxRoomCount, () => {
@@ -98,8 +102,8 @@ export const buildDungeon = (props: DungeonProps) => {
     );
 
     // test if candidate is overlapping with any existing rooms
-    if (!rooms.some((room) => rectsIntersect(room, candidate))) {
-      rooms.push(candidate);
+    if (!dungeon.rooms.some((room) => rectsIntersect(room, candidate))) {
+      dungeon.rooms.push(candidate);
       roomTiles = { ...roomTiles, ...candidate.tiles };
     }
   });
@@ -107,7 +111,7 @@ export const buildDungeon = (props: DungeonProps) => {
   let prevRoom = null;
   let passageTiles = {};
 
-  for (let room of rooms) {
+  for (let room of dungeon.rooms) {
     if (prevRoom) {
       passageTiles = {
         ...passageTiles,
@@ -233,5 +237,9 @@ export const generateDungeon = () => {
     newTile.components.position!.x = tile.x;
     newTile.components.position!.y = tile.y;
     newTile.components.position!.z = tile.z;
+
+    addEAP(newTile);
   }
+
+  return dungeon
 };
