@@ -115,12 +115,16 @@ const init = async () => {
     [{ tint: 0xff0077 }, { string: "forcecrusher", tint: 0xffffff }],
   ]);
 
+  // 3 render layers
+  // 1: background
+  // 2: character
+  // 3: foreground
   const mapView = new View({
     width: 74,
     height: 39,
     x: 13,
     y: 3,
-    layers: 2,
+    layers: 3,
     tileSets: ["tile", "ascii", "tile"],
     tints: [0x222222, 0x222222, 0x000000],
     alphas: [1, 1, 0],
