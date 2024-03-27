@@ -1,5 +1,5 @@
 import { mean } from "lodash";
-import { setupCanvas, View } from "./canvas";
+import { setupCanvas, View } from "./lib/canvas";
 import "./style.css";
 import { userInputSystem } from "./systems/userInput.system";
 import { renderSystem } from "./systems/render.system";
@@ -9,7 +9,7 @@ import { WId, EIds, Entity } from "./engine/index.types";
 import { createPlayer } from "./prefabs/player.prefab";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
-import { toPosId } from "./grid";
+import { toPosId } from "./lib/grid";
 
 const enum Turn {
   PLAYER = "PLAYER",

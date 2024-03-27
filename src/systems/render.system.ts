@@ -1,7 +1,7 @@
 import { State, getState, setState } from "../main";
 import { getEntity, getQuery } from "../engine";
 import { QueryTypes } from "../queries";
-import { toPos } from "../grid";
+import { toPos } from "../lib/grid";
 
 export const renderSystem = () => {
   const hasAppearance = getQuery(QueryTypes.HasAppearance);

@@ -7,7 +7,7 @@ import {
   rectangle,
   rectsIntersect,
   toPosId,
-} from "../grid";
+} from "../lib/grid";
 import { getState, addEAP } from "../main";
 import { createWall } from "../prefabs/wall.prefab";
 import { createFloor } from "../prefabs/floor.prefab";

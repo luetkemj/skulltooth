@@ -1,5 +1,5 @@
 import { addComponent, getEntity, getQuery } from "../engine";
-import { toPosId } from "../grid";
+import { toPosId } from "../lib/grid";
 import { getState, setState, State } from "../main";
 import { QueryTypes } from "../queries";
 
