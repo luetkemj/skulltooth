@@ -1,13 +1,34 @@
-import { getQuery, addComponent, removeComponent } from "../engine";
+import { getQuery, addComponent, getEntity, removeComponent } from "../engine";
 import { ComponentTypes } from "../engine/index.types";
 import { getState } from "../main";
-import { type Pos } from "../lib/grid";
 import createFOV from "../lib/fov";
 import { QueryTypes } from "../queries";
 
-export const fovSystem = (origin: Pos) => {
+export const fovSystem = () => {
   const inFovQuery = getQuery(QueryTypes.IsInFov);
   const opaqueQuery = getQuery(QueryTypes.IsOpaque);
+  const isPlayer = getQuery(QueryTypes.IsPlayer);
+
+  // there's gotta be a better way - get the id from setup in main.ts
+  const playerEId = [...isPlayer.entities][0]
+
+  if (!playerEId) {
+    console.log('no player id')
+    return
+  }
+
+  const playerEntity = getEntity(playerEId)
+
+  if (!playerEntity) {
+    console.log('no player entity')
+    return
+  }
+
+  const origin = playerEntity.components.position
+
+  if (!origin) {
+    return
+  }
 
   const FOV = createFOV(
     opaqueQuery,

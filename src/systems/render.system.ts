@@ -4,12 +4,13 @@ import { QueryTypes } from "../queries";
 import { toPos } from "../lib/grid";
 
 export const renderSystem = () => {
+  const inFov = getQuery(QueryTypes.IsInFov);
   const hasAppearance = getQuery(QueryTypes.HasAppearance);
   const isPlayer = getQuery(QueryTypes.IsPlayer);
 
   const { map: mapView } = getState().views;
 
-  for (const eId of hasAppearance.entities) {
+  for (const eId of inFov.entities) {
     const entity = getEntity(eId);
     if (!entity) return;
 

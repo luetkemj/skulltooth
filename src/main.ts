@@ -4,6 +4,7 @@ import "./style.css";
 import { userInputSystem } from "./systems/userInput.system";
 import { renderSystem } from "./systems/render.system";
 import { movementSystem } from "./systems/movement.system";
+import { fovSystem } from "./systems/fov.system";
 import { createWorld, getEngine } from "./engine";
 import { WId, EIds, Entity } from "./engine/index.types";
 import { createPlayer } from "./prefabs/player.prefab";
@@ -96,10 +97,10 @@ const init = async () => {
 
   createQueries();
   const dungeon = generateDungeon();
-  const startingPosition = dungeon!.rooms[0].center
+  const startingPosition = dungeon!.rooms[0].center;
 
-  createPlayer(getState().wId, startingPosition);
-
+  const player = createPlayer(getState().wId, startingPosition);
+  console.log(player);
 
   new View({
     width: 12,
@@ -177,6 +178,7 @@ function gameLoop() {
   if (getState().userInput && getState().turn === Turn.PLAYER) {
     userInputSystem();
     movementSystem();
+    fovSystem();
     renderSystem();
 
     setState((state: State) => {
@@ -185,6 +187,7 @@ function gameLoop() {
   }
 
   if (getState().turn === Turn.WORLD) {
+    fovSystem();
     renderSystem();
 
     setState((state: State) => {
