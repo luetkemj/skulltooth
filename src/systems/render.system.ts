@@ -5,10 +5,24 @@ import { toPos } from "../lib/grid";
 
 export const renderSystem = () => {
   const inFov = getQuery(QueryTypes.IsInFov);
+  const isRevealed = getQuery(QueryTypes.IsRevealed);
   const hasAppearance = getQuery(QueryTypes.HasAppearance);
   const isPlayer = getQuery(QueryTypes.IsPlayer);
 
   const { map: mapView } = getState().views;
+
+  for (const eId of isRevealed.entities) {
+    const entity = getEntity(eId);
+    if (!entity) return;
+
+    const { char, tint } = entity.components.appearance!;
+    const { x, y } = entity.components.position!;
+
+    mapView?.updateCell({
+      0: { char, tint, alpha: 0.35, tileSet: "ascii", x, y },
+    });
+  }
+
 
   for (const eId of inFov.entities) {
     const entity = getEntity(eId);

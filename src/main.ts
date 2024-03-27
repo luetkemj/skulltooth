@@ -6,7 +6,7 @@ import { renderSystem } from "./systems/render.system";
 import { movementSystem } from "./systems/movement.system";
 import { fovSystem } from "./systems/fov.system";
 import { createWorld, getEngine } from "./engine";
-import { WId, EIds, Entity } from "./engine/index.types";
+import { WId, EId, EIds, Entity } from "./engine/index.types";
 import { createPlayer } from "./prefabs/player.prefab";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
@@ -30,6 +30,7 @@ export type State = {
     map?: View;
   };
   wId: WId;
+  playerEId: EId;
 };
 
 declare global {
@@ -51,6 +52,7 @@ const state: State = {
   userInput: null,
   views: {},
   wId: "",
+  playerEId: "",
 };
 
 window.skulltooth.state = state;
@@ -100,7 +102,9 @@ const init = async () => {
   const startingPosition = dungeon!.rooms[0].center;
 
   const player = createPlayer(getState().wId, startingPosition);
-  console.log(player);
+  setState((state: State) => {
+    state.playerEId = player.id;
+  }) 
 
   new View({
     width: 12,
@@ -127,7 +131,7 @@ const init = async () => {
     y: 3,
     layers: 3,
     tileSets: ["tile", "ascii", "tile"],
-    tints: [0x222222, 0x222222, 0x000000],
+    tints: [0x000000, 0x000000, 0x000000],
     alphas: [1, 1, 0],
   });
 

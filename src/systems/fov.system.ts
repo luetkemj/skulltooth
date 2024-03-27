@@ -7,17 +7,8 @@ import { QueryTypes } from "../queries";
 export const fovSystem = () => {
   const inFovQuery = getQuery(QueryTypes.IsInFov);
   const opaqueQuery = getQuery(QueryTypes.IsOpaque);
-  const isPlayer = getQuery(QueryTypes.IsPlayer);
 
-  // there's gotta be a better way - get the id from setup in main.ts
-  const playerEId = [...isPlayer.entities][0]
-
-  if (!playerEId) {
-    console.log('no player id')
-    return
-  }
-
-  const playerEntity = getEntity(playerEId)
+  const playerEntity = getEntity(getState().playerEId)
 
   if (!playerEntity) {
     console.log('no player entity')
