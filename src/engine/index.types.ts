@@ -19,7 +19,10 @@ type TryMoveComponent = {
 export enum ComponentTypes {
   Appearance = "appearance",
   IsBlocking = "isBlocking",
+  IsInFov = 'isInFov',
+  IsOpaque = 'isOpaque',
   IsPlayer = "isPlayer",
+  IsRevealed = "isRevealed",
   Position = "position",
   TryMove = "tryMove",
 }
@@ -27,7 +30,13 @@ export enum ComponentTypes {
 export type Components = {
   appearance?: AppearanceComponent;
   isBlocking?: {};
+  isInFov?: {};
+  isOpaque?: {};
   isPlayer?: {};
+  isRevealed?: {};
+  layer100?: {}; // ground layer
+  layer200?: {}; // item layer
+  layer300?: {}; // actor layer
   position?: PositionComponent;
   tryMove?: TryMoveComponent;
 };

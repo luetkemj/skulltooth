@@ -1,15 +1,32 @@
 import { State, getState, setState } from "../main";
 import { getEntity, getQuery } from "../engine";
 import { QueryTypes } from "../queries";
-import { toPos } from "../grid";
+import { toPos } from "../lib/grid";
+
+// this is not doing anything to reduce the cells that need to be rendered.
+// if things slow down or we run into other issues we will need to expand onor use the toRender info from state - not really using that yet.
 
 export const renderSystem = () => {
-  const hasAppearance = getQuery(QueryTypes.HasAppearance);
+  const inFov = getQuery(QueryTypes.IsInFov);
+  const isRevealed = getQuery(QueryTypes.IsRevealed);
   const isPlayer = getQuery(QueryTypes.IsPlayer);
 
   const { map: mapView } = getState().views;
 
-  for (const eId of hasAppearance.entities) {
+  for (const eId of isRevealed.entities) {
+    const entity = getEntity(eId);
+    if (!entity) return;
+
+    const { char, tint } = entity.components.appearance!;
+    const { x, y } = entity.components.position!;
+
+    mapView?.updateCell({
+      0: { char, tint, alpha: 0.35, tileSet: "ascii", x, y },
+    });
+  }
+
+
+  for (const eId of inFov.entities) {
     const entity = getEntity(eId);
     if (!entity) return;
 

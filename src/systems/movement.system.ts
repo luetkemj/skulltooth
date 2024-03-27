@@ -1,5 +1,6 @@
-import { getEntity, getQuery } from "../engine";
-import { toPosId } from "../grid";
+import { getEntity, getQuery, removeComponent } from "../engine";
+import { ComponentTypes } from "../engine/index.types";
+import { toPosId } from "../lib/grid";
 import { getState, addEAP, removeEAP } from "../main";
 import { QueryTypes } from "../queries";
 
@@ -25,6 +26,8 @@ export const movementSystem = () => {
         return console.log('you can go no further')
       }
     }
+
+    removeComponent(eId, ComponentTypes.TryMove)
 
     // if everything checks out - update position
     // should we set this new location to toRender in state?

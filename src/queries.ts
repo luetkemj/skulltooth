@@ -3,7 +3,10 @@ import { ComponentTypes } from "./engine/index.types";
 
 export enum QueryTypes {
   HasAppearance = "hasAppearance",
+  IsInFov = "isInFov",
+  IsOpaque = "isOpaque",
   IsPlayer = "isPlayer",
+  IsRevealed = "isRevealed",
   IsTryingToMove = "isTryingToMove",
 }
 
@@ -12,6 +15,24 @@ export const createQueries = () => {
     any: [],
     all: [ComponentTypes.Appearance, ComponentTypes.Appearance],
     none: [],
+  });
+
+  createQuery(QueryTypes.IsInFov, {
+    any: [ComponentTypes.IsInFov],
+    all: [],
+    none: [],
+  });
+
+  createQuery(QueryTypes.IsOpaque, {
+    any: [ComponentTypes.IsOpaque],
+    all: [],
+    none: [],
+  });
+
+  createQuery(QueryTypes.IsRevealed, {
+    any: [ComponentTypes.IsRevealed],
+    all: [],
+    none: [ComponentTypes.IsInFov],
   });
 
   createQuery(QueryTypes.IsPlayer, {

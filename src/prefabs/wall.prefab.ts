@@ -11,5 +11,7 @@ export const createWall = (wId: WId) => {
     },
     position: { x: 0, y: 0, z: 0 },
     isBlocking: {},
+    layer100: {},
+    isOpaque: {},
   });
 };

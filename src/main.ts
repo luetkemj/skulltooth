@@ -1,15 +1,16 @@
 import { mean } from "lodash";
-import { setupCanvas, View } from "./canvas";
+import { setupCanvas, View } from "./lib/canvas";
 import "./style.css";
 import { userInputSystem } from "./systems/userInput.system";
 import { renderSystem } from "./systems/render.system";
 import { movementSystem } from "./systems/movement.system";
+import { fovSystem } from "./systems/fov.system";
 import { createWorld, getEngine } from "./engine";
-import { WId, EIds, Entity } from "./engine/index.types";
+import { WId, EId, EIds, Entity } from "./engine/index.types";
 import { createPlayer } from "./prefabs/player.prefab";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
-import { toPosId } from "./grid";
+import { toPosId } from "./lib/grid";
 
 const enum Turn {
   PLAYER = "PLAYER",
@@ -29,6 +30,7 @@ export type State = {
     map?: View;
   };
   wId: WId;
+  playerEId: EId;
 };
 
 declare global {
@@ -50,6 +52,7 @@ const state: State = {
   userInput: null,
   views: {},
   wId: "",
+  playerEId: "",
 };
 
 window.skulltooth.state = state;
@@ -96,10 +99,12 @@ const init = async () => {
 
   createQueries();
   const dungeon = generateDungeon();
-  const startingPosition = dungeon!.rooms[0].center
+  const startingPosition = dungeon!.rooms[0].center;
 
-  createPlayer(getState().wId, startingPosition);
-
+  const player = createPlayer(getState().wId, startingPosition);
+  setState((state: State) => {
+    state.playerEId = player.id;
+  }) 
 
   new View({
     width: 12,
@@ -115,14 +120,18 @@ const init = async () => {
     [{ tint: 0xff0077 }, { string: "forcecrusher", tint: 0xffffff }],
   ]);
 
+  // 3 render layers
+  // 1: background
+  // 2: character
+  // 3: foreground
   const mapView = new View({
     width: 74,
     height: 39,
     x: 13,
     y: 3,
-    layers: 2,
+    layers: 3,
     tileSets: ["tile", "ascii", "tile"],
-    tints: [0x222222, 0x222222, 0x000000],
+    tints: [0x000000, 0x000000, 0x000000],
     alphas: [1, 1, 0],
   });
 
@@ -173,6 +182,7 @@ function gameLoop() {
   if (getState().userInput && getState().turn === Turn.PLAYER) {
     userInputSystem();
     movementSystem();
+    fovSystem();
     renderSystem();
 
     setState((state: State) => {
@@ -181,6 +191,7 @@ function gameLoop() {
   }
 
   if (getState().turn === Turn.WORLD) {
+    fovSystem();
     renderSystem();
 
     setState((state: State) => {

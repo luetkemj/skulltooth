@@ -7,8 +7,8 @@ import {
   Spritesheet,
   Texture,
 } from "pixi.js";
-import { menloBoldAlphaMap as asciiMap } from "./sprite-maps/menlo-bold.map";
-import { menloBoldHalfAlphaMap as fontMap } from "./sprite-maps/menlo-bold-half.map";
+import { menloBoldAlphaMap as asciiMap } from "../sprite-maps/menlo-bold.map";
+import { menloBoldHalfAlphaMap as fontMap } from "../sprite-maps/menlo-bold-half.map";
 
 let app: Application;
 

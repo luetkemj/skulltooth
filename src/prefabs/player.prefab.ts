@@ -13,6 +13,8 @@ export const createPlayer = (wId: WId, position: Pos) => {
     },
     isPlayer: {},
     position, 
+    layer200: {},
   });
   addEAP(entity);
+  return entity
 };
