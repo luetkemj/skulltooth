@@ -1,7 +1,7 @@
 import { addComponent, createEntity } from "../engine";
 import { WId } from "../engine/index.types";
 import { addEAP } from "../main";
-import { Pos } from "../grid";
+import { Pos } from "../lib/grid";
 
 export const createPlayer = (wId: WId, position: Pos) => {
   const entity = createEntity({ wId });
