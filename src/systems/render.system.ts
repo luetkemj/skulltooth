@@ -10,7 +10,6 @@ export const renderSystem = () => {
   const inFov = getQuery(QueryTypes.IsInFov);
   const isRevealed = getQuery(QueryTypes.IsRevealed);
   const isPlayer = getQuery(QueryTypes.IsPlayer);
-  const hasAppearance = getQuery(QueryTypes.HasAppearance);
 
   const { map: mapView } = getState().views;
 
@@ -66,6 +65,7 @@ export const renderSystem = () => {
     });
 
     // // for debugging
+    // const hasAppearance = getQuery(QueryTypes.HasAppearance);
     // for (const eId of hasAppearance.entities) {
     //   const entity = getEntity(eId);
     //   if (!entity) return;

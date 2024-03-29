@@ -40,7 +40,7 @@ export type Components = {
   layer100?: {}; // ground layer
   layer200?: {}; // item layer
   layer300?: {}; // actor layer
-  pathThrough: {};
+  pathThrough?: {};
   position?: PositionComponent;
   tryMove?: TryMoveComponent;
 };
