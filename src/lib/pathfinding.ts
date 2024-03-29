@@ -18,7 +18,7 @@ export const aStar = (start: Pos, goal: Pos) => {
 
         if (!entity) return
 
-        return entity.components.isBlocking;
+        return entity.components.isBlocking && !entity.components.pathThrough;
       })
     ) {
       matrix.setWalkableAt(cell.x, cell.y, false);

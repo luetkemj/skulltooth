@@ -2,12 +2,14 @@ import { mean } from "lodash";
 import { setupCanvas, View } from "./lib/canvas";
 import "./style.css";
 import { userInputSystem } from "./systems/userInput.system";
+import { aiSystem } from "./systems/ai.system";
 import { renderSystem } from "./systems/render.system";
 import { movementSystem } from "./systems/movement.system";
 import { fovSystem } from "./systems/fov.system";
 import { createWorld, getEngine } from "./engine";
 import { WId, EId, EIds, Entity } from "./engine/index.types";
 import { createPlayer } from "./prefabs/player.prefab";
+import { createOwlbear } from "./prefabs/owlbear.prefab";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
 import { toPosId } from "./lib/grid";
@@ -108,6 +110,12 @@ const init = async () => {
     state.playerEId = player.id;
   });
 
+  dungeon!.rooms.forEach((room, index)=> {
+    if (index) {
+      createOwlbear(getState().wId, room.center);
+    } 
+  })
+
   new View({
     width: 12,
     height: 2,
@@ -197,6 +205,8 @@ function gameLoop() {
   }
 
   if (getState().turn === Turn.WORLD) {
+    aiSystem();
+    movementSystem();
     fovSystem();
     renderSystem();
 

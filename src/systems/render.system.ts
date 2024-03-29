@@ -65,7 +65,7 @@ export const renderSystem = () => {
       });
     });
 
-    // for debugging
+    // // for debugging
     // for (const eId of hasAppearance.entities) {
     //   const entity = getEntity(eId);
     //   if (!entity) return;
