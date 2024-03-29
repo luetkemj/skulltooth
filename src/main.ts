@@ -12,6 +12,8 @@ import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
 import { toPosId } from "./lib/grid";
 
+import { aStar } from "./lib/pathfinding";
+
 const enum Turn {
   PLAYER = "PLAYER",
   WORLD = "WORLD",
@@ -104,7 +106,7 @@ const init = async () => {
   const player = createPlayer(getState().wId, startingPosition);
   setState((state: State) => {
     state.playerEId = player.id;
-  }) 
+  });
 
   new View({
     width: 12,
@@ -161,6 +163,10 @@ const init = async () => {
     state.views.fps = fpsView;
     state.views.map = mapView;
   });
+
+  const start = dungeon!.rooms[0].center;
+  const goal = dungeon!.rooms[1].center;
+  aStar(start, goal);
 
   gameLoop();
 
