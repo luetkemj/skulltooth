@@ -10,6 +10,7 @@ export const renderSystem = () => {
   const inFov = getQuery(QueryTypes.IsInFov);
   const isRevealed = getQuery(QueryTypes.IsRevealed);
   const isPlayer = getQuery(QueryTypes.IsPlayer);
+  const hasAppearance = getQuery(QueryTypes.HasAppearance);
 
   const { map: mapView } = getState().views;
 
@@ -24,7 +25,6 @@ export const renderSystem = () => {
       0: { char, tint, alpha: 0.35, tileSet: "ascii", x, y },
     });
   }
-
 
   for (const eId of inFov.entities) {
     const entity = getEntity(eId);
@@ -48,7 +48,7 @@ export const renderSystem = () => {
     mapView?.updateCell({
       1: { char, tint, alpha: 1, tileSet: "ascii", x, y },
     });
-    
+
     // this is throwaway until I get the map thing done
     // reset last location to original
     getState().toRender.forEach((posId) => {
@@ -65,6 +65,20 @@ export const renderSystem = () => {
       });
     });
 
-    setState(( state: State ) => state.toRender = new Set())
+    // // for debugging
+    // for (const eId of hasAppearance.entities) {
+    //   const entity = getEntity(eId);
+    //   if (!entity) return;
+    //
+    //   const { char, tint } = entity.components.appearance!;
+    //   const { x, y } = entity.components.position!;
+    //
+    //   mapView?.updateCell({
+    //     0: { char, tint, alpha: 1, tileSet: "ascii", x, y },
+    //   });
+    // }
+    // end debug section
+
+    setState((state: State) => (state.toRender = new Set()));
   }
 };

@@ -2,6 +2,7 @@ import { createQuery } from "./engine";
 import { ComponentTypes } from "./engine/index.types";
 
 export enum QueryTypes {
+  HasAi = "hasAi",
   HasAppearance = "hasAppearance",
   IsInFov = "isInFov",
   IsOpaque = "isOpaque",
@@ -11,9 +12,15 @@ export enum QueryTypes {
 }
 
 export const createQueries = () => {
+  createQuery(QueryTypes.HasAi, {
+    any: [],
+    all: [ComponentTypes.Ai],
+    none: [],
+  });
+
   createQuery(QueryTypes.HasAppearance, {
     any: [],
-    all: [ComponentTypes.Appearance, ComponentTypes.Appearance],
+    all: [ComponentTypes.Appearance],
     none: [],
   });
 

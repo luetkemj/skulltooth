@@ -3,15 +3,16 @@ import { WId } from "../engine/index.types";
 import { addEAP } from "../main";
 import { Pos } from "../lib/grid";
 
-export const createPlayer = (wId: WId, position: Pos) => {
+export const createOwlbear = (wId: WId, position: Pos) => {
   const entity = createEntity({ wId });
   addComponent(entity.id, {
+    ai: {},
     appearance: {
-      char: "@",
+      char: "F",
       tint: 0xff0088,
       tileSet: "ascii",
     },
-    isPlayer: {},
+    pathThrough: {},
     position, 
     layer200: {},
     isBlocking: {},
