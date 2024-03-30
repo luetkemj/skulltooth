@@ -6,8 +6,14 @@ import { aiSystem } from "./systems/ai.system";
 import { renderSystem } from "./systems/render.system";
 import { movementSystem } from "./systems/movement.system";
 import { fovSystem } from "./systems/fov.system";
-import { createWorld, getEngine } from "./engine";
-import { WId, EId, EIds, Entity } from "./engine/index.types";
+import {
+  type WId,
+  type EId,
+  type EIds,
+  type Entity,
+  createWorld,
+  getEngine,
+} from "./engine";
 import { createOwlbear, createPlayer } from "./actors";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
@@ -109,11 +115,11 @@ const init = async () => {
     state.playerEId = player.id;
   });
 
-  dungeon!.rooms.forEach((room, index)=> {
+  dungeon!.rooms.forEach((room, index) => {
     if (index) {
       createOwlbear(getState().wId, room.center);
-    } 
-  })
+    }
+  });
 
   new View({
     width: 12,

@@ -1,4 +1,4 @@
-import { Components } from "../engine/index.types";
+import { Components } from "../engine";
 
 export const renderable: Components = {
   appearance: {
@@ -7,7 +7,7 @@ export const renderable: Components = {
     tileSet: "ascii",
   },
   position: { x: 0, y: 0, z: 0 },
-}
+};
 
 export const tile: Components = {
   layer100: {},
@@ -25,6 +25,6 @@ export const being: Components = {
 };
 
 export const mob: Components = {
-    ai: {},
-    pathThrough: {},
-}
+  ai: {},
+  pathThrough: {},
+};

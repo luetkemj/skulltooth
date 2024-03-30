@@ -1,5 +1,4 @@
-import { addComponent, addPrefabs, createEntity } from "../engine";
-import { WId } from "../engine/index.types";
+import { type WId, addComponent, addPrefabs, createEntity } from "../engine";
 import { addEAP } from "../main";
 import { Pos } from "../lib/grid";
 import { renderable, tile, blockingTile, being, mob } from "../actors/prefabs";
