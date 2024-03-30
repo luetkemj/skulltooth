@@ -2,7 +2,7 @@ import PF from "pathfinding";
 import { some } from "lodash";
 import { type Pos, toPos } from "./grid";
 import { getState } from "../main";
-import { getEntity } from '../engine/index'
+import { getEntity } from '../engine'
 
 export const aStar = (start: Pos, goal: Pos) => {
   const { width, height } = getState().views.map!;

@@ -30,13 +30,11 @@ export const fovSystem = () => {
   );
 
   // clear out stale fov
-  // inFovEntities.get().forEach((x) => x.remove(IsInFov));
   inFovQuery.entities.forEach((eId) => {
     removeComponent(eId, ComponentTypes.IsInFov);
   });
 
   FOV.fov.forEach((posId) => {
-    // const entitiesAtLoc = readCacheSet("entitiesAtLocation", posId);
     const eAP = getState().eAP[posId];
 
     if (eAP) {

@@ -1,4 +1,4 @@
-import { every, some } from "lodash";
+import { cloneDeep, every, some } from "lodash";
 
 import {
   Components,
@@ -207,6 +207,16 @@ export const removeComponent = (eId: EId, componentName: ComponentTypes) => {
   return entity;
 };
 
+export const addPrefab = (eId: string, prefab: Components) => {
+  addComponent(eId, cloneDeep(prefab));
+};
+
+export const addPrefabs = (eId: string, prefabs: Array<Components>) => {
+  prefabs.forEach((prefab) => {
+    addComponent(eId, cloneDeep(prefab));
+  });
+};
+
 /////////
 // SYSTEM
 /////////
@@ -263,27 +273,27 @@ export const getEngineSnapshot = () => {
 };
 
 export const getEngineFromSnapshot = (snapshot: string) => {
-    const {_id, entities, worlds} = JSON.parse(snapshot)
-    return {
-        entities: parseEntities(entities),
-        worlds: parseWorlds(worlds),
-        _id,
-    }
-}
+  const { _id, entities, worlds } = JSON.parse(snapshot);
+  return {
+    entities: parseEntities(entities),
+    worlds: parseWorlds(worlds),
+    _id,
+  };
+};
 
 export const getRawEngineSnapshot = () => {
-    return {
-        entities,
-        worlds,
-        _id,
-    }
-}
+  return {
+    entities,
+    worlds,
+    _id,
+  };
+};
 
 export const getEngine = () => {
-    return {
-        entities,
-        worlds,
-        queries,
-        _id,
-    }
-}
+  return {
+    entities,
+    worlds,
+    queries,
+    _id,
+  };
+};

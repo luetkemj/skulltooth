@@ -1,4 +1,4 @@
-import { getEntity } from "../engine/index";
+import { getEntity } from "../engine";
 import { type Query, type EIds } from "../engine/index.types";
 import { type Pos } from "./grid";
 
