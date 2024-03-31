@@ -14,14 +14,18 @@ export const tile: Components = {
 };
 
 export const blockingTile: Components = {
-  layer100: {},
   isBlocking: {},
   isOpaque: {},
+  layer100: {},
 };
 
 export const being: Components = {
-  layer200: {},
+  health: {
+    max: 10,
+    current: 10,
+  },
   isBlocking: {},
+  layer200: {},
 };
 
 export const mob: Components = {

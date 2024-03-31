@@ -26,7 +26,20 @@ export const movementSystem = () => {
     const eAP = getState().eAP[posId];
 
     for (const eId of eAP) {
-      if (getEntity(eId)?.components.isBlocking) {
+      const target = getEntity(eId)
+      if (target?.components.isBlocking) {
+        if (target?.components.health) {
+          console.log('attack!')
+          target.components.health.current -= 5;
+
+          if (target.components.health.current <= 0) {
+            console.log('done dead!')
+            target.components.appearance!.char = '%'
+            removeComponent(target.id, ComponentTypes.Ai)
+            removeComponent(target.id, ComponentTypes.IsBlocking)
+          }
+        }
+
         return // console.log("you can go no further");
       }
     }

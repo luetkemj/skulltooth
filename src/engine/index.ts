@@ -6,6 +6,11 @@ type AppearanceComponent = {
   tileSet: string;
 };
 
+type HealthComponent = {
+  max: number;
+  current: number;
+};
+
 type PositionComponent = {
   x: number;
   y: number;
@@ -21,6 +26,7 @@ type TryMoveComponent = {
 export enum ComponentTypes {
   Ai = "ai",
   Appearance = "appearance",
+  Health = 'health',
   IsBlocking = "isBlocking",
   IsInFov = "isInFov",
   IsOpaque = "isOpaque",
@@ -34,6 +40,7 @@ export enum ComponentTypes {
 export type Components = {
   ai?: {},
   appearance?: AppearanceComponent;
+  health?: HealthComponent;
   isBlocking?: {};
   isInFov?: {};
   isOpaque?: {};

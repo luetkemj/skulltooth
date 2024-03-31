@@ -204,7 +204,7 @@ const init = async () => {
 
     if (!state.eAP[posId]) return;
 
-    if (window.skulltooth.debug === true) {
+    if (window.skulltooth.debug === true || import.meta.env.DEV) {
       state.eAP[posId].forEach((eId) => {
         console.log(getEntity(eId));
       });
