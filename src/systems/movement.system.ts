@@ -27,7 +27,7 @@ export const movementSystem = () => {
 
     for (const eId of eAP) {
       if (getEntity(eId)?.components.isBlocking) {
-        return console.log("you can go no further");
+        return // console.log("you can go no further");
       }
     }
 
