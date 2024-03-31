@@ -30,8 +30,8 @@ import {
   parseWorlds,
   getRawEngineSnapshot,
   getEngineFromSnapshot,
+  ComponentTypes,
 } from "./index";
-import { ComponentTypes } from "./index.types";
 
 describe("engine", () => {
   beforeEach(() => {

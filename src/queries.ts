@@ -1,5 +1,4 @@
-import { createQuery } from "./engine";
-import { ComponentTypes } from "./engine/index.types";
+import { ComponentTypes, createQuery } from "./engine";
 
 export enum QueryTypes {
   HasAi = "hasAi",

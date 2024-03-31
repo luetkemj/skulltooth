@@ -25,7 +25,14 @@ const grid = {
 };
 
 const cellWidth = window.innerWidth / grid.width;
-// const cellHfW = cellWidth / 2;
+
+export const pxToPosId = (x: number, y: number, z: number) => {
+  const posX = Math.trunc(x / cellWidth);
+  const posY = Math.trunc(y / cellWidth);
+  const posZ = z;
+
+  return `${posX},${posY},${posZ}`;
+};
 
 type Textures = {
   ascii: Spritesheet;
@@ -46,6 +53,9 @@ export async function setupCanvas(element: HTMLCanvasElement): Promise<void> {
   });
 
   await loadSprites();
+
+  // to enable devtools
+  // globalThis.__PIXI_APP__ = app;
 }
 
 export const loadSprites = async (): Promise<Textures> => {

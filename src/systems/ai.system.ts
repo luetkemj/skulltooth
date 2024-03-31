@@ -1,5 +1,4 @@
-import { addComponent, getEntity, getQuery } from "../engine";
-import { Entity } from "../engine/index.types";
+import { type Entity, addComponent, getEntity, getQuery } from "../engine";
 import { QueryTypes } from "../queries";
 import { aStar } from "../lib/pathfinding";
 

@@ -21,7 +21,8 @@ export const renderSystem = () => {
     const { x, y } = entity.components.position!;
 
     mapView?.updateCell({
-      0: { char, tint, alpha: 0.35, tileSet: "ascii", x, y },
+      0: { char, tint: 0x000001, alpha: 1, tileSet: "tile", x, y },
+      1: { char, tint, alpha: 0.35, tileSet: "ascii", x, y },
     });
   }
 
@@ -33,7 +34,8 @@ export const renderSystem = () => {
     const { x, y } = entity.components.position!;
 
     mapView?.updateCell({
-      0: { char, tint, alpha: 1, tileSet: "ascii", x, y },
+      0: { char, tint: 0x111111, alpha: 1, tileSet: "tile", x, y },
+      1: { char, tint, alpha: 1, tileSet: "ascii", x, y },
     });
   }
 

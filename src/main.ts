@@ -1,15 +1,21 @@
 import { mean } from "lodash";
-import { setupCanvas, View } from "./lib/canvas";
+import { pxToPosId, setupCanvas, View } from "./lib/canvas";
 import "./style.css";
 import { userInputSystem } from "./systems/userInput.system";
 import { aiSystem } from "./systems/ai.system";
 import { renderSystem } from "./systems/render.system";
 import { movementSystem } from "./systems/movement.system";
 import { fovSystem } from "./systems/fov.system";
-import { createWorld, getEngine } from "./engine";
-import { WId, EId, EIds, Entity } from "./engine/index.types";
-import { createPlayer } from "./prefabs/player.prefab";
-import { createOwlbear } from "./prefabs/owlbear.prefab";
+import {
+  type WId,
+  type EId,
+  type EIds,
+  type Entity,
+  createWorld,
+  getEngine,
+  getEntity,
+} from "./engine";
+import { createOwlbear, createPlayer } from "./actors";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
 import { toPosId } from "./lib/grid";
@@ -35,6 +41,7 @@ export type State = {
   };
   wId: WId;
   playerEId: EId;
+  z: number;
 };
 
 declare global {
@@ -42,11 +49,13 @@ declare global {
     skulltooth: {
       state: State;
       getEngine: Function;
+      debug: Boolean;
     };
   }
 }
 window.skulltooth = window.skulltooth || {};
 window.skulltooth.getEngine = () => getEngine();
+window.skulltooth.debug = false;
 
 const state: State = {
   eAP: {},
@@ -57,6 +66,7 @@ const state: State = {
   views: {},
   wId: "",
   playerEId: "",
+  z: 0,
 };
 
 window.skulltooth.state = state;
@@ -110,11 +120,11 @@ const init = async () => {
     state.playerEId = player.id;
   });
 
-  dungeon!.rooms.forEach((room, index)=> {
+  dungeon!.rooms.forEach((room, index) => {
     if (index) {
       createOwlbear(getState().wId, room.center);
-    } 
-  })
+    }
+  });
 
   new View({
     width: 12,
@@ -182,6 +192,23 @@ const init = async () => {
     setState((state: State) => {
       state.userInput = ev;
     });
+  });
+
+  // log entities on mouseclick at position
+  document.addEventListener("mousedown", (ev: any) => {
+    const x = ev.x - state.views.map!.layers[0].x;
+    const y = ev.layerY - state.views.map!.layers[0].y;
+    const z = state.z;
+
+    const posId = pxToPosId(x, y, z);
+
+    if (!state.eAP[posId]) return;
+
+    if (window.skulltooth.debug === true) {
+      state.eAP[posId].forEach((eId) => {
+        console.log(getEntity(eId));
+      });
+    }
   });
 };
 
