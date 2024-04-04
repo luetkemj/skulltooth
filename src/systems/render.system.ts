@@ -6,12 +6,33 @@ import { toPos } from "../lib/grid";
 // this is not doing anything to reduce the cells that need to be rendered.
 // if things slow down or we run into other issues we will need to expand onor use the toRender info from state - not really using that yet.
 
+const concatRow = (str: string, length: number): string => {
+  let newStr = str;
+  if (newStr.length > length) {
+    const trimLength = newStr.length - (length - 3);
+    newStr = newStr
+      .substring(0, newStr.length - trimLength)
+      .trim()
+      .concat("...");
+  }
+  return newStr;
+};
+
+// create a gradiant across rows
+const getAlpha = (index: number) => {
+  if (index < 4) {
+    return (100 - (5 - index) * 7) / 100;
+  }
+
+  return 1;
+};
+
 export const renderSystem = () => {
   const inFov = getQuery(QueryTypes.IsInFov);
   const isRevealed = getQuery(QueryTypes.IsRevealed);
   const isPlayer = getQuery(QueryTypes.IsPlayer);
 
-  const { map: mapView } = getState().views;
+  const { map: mapView, log: logView, senses: sensesView } = getState().views;
 
   for (const eId of isRevealed.entities) {
     const entity = getEntity(eId);
@@ -82,5 +103,31 @@ export const renderSystem = () => {
     // end debug section
 
     setState((state: State) => (state.toRender = new Set()));
+  }
+
+  {
+    // render log
+    const log = getState().log;
+    const messages = log.slice(Math.max(log.length - 5, 0));
+    const width = logView!.width - 1;
+
+    logView?.updateRows(
+      messages.map((message, index) => {
+        return [{ string: concatRow(message, width), alpha: getAlpha(index) }];
+      })
+    );
+  }
+
+  {
+    // render sensory perception
+    const senses = getState().senses;
+    const width = sensesView!.width - 1;
+    sensesView?.updateRows([
+      [{ string: concatRow(senses.feel, width) }],
+      [{ string: concatRow(senses.see, width) }],
+      [{ string: concatRow(senses.hear, width) }],
+      [{ string: concatRow(senses.smell, width) }],
+      [{ string: concatRow(senses.taste, width) }],
+    ]);
   }
 };

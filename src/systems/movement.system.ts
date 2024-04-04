@@ -5,7 +5,15 @@ import {
   removeComponent,
 } from "../engine";
 import { toPosId } from "../lib/grid";
-import { getState, addEAP, removeEAP } from "../main";
+import {
+  addLog,
+  getState,
+  addEAP,
+  removeEAP,
+  setState,
+  GameState,
+  type State,
+} from "../main";
 import { QueryTypes } from "../queries";
 
 export const movementSystem = () => {
@@ -26,21 +34,29 @@ export const movementSystem = () => {
     const eAP = getState().eAP[posId];
 
     for (const eId of eAP) {
-      const target = getEntity(eId)
+      const target = getEntity(eId);
       if (target?.components.isBlocking) {
         if (target?.components.health) {
-          console.log('attack!')
           target.components.health.current -= 5;
+          addLog("Target has been hit for 5 damage");
 
           if (target.components.health.current <= 0) {
-            console.log('done dead!')
-            target.components.appearance!.char = '%'
-            removeComponent(target.id, ComponentTypes.Ai)
-            removeComponent(target.id, ComponentTypes.IsBlocking)
+            target.components.appearance!.char = "%";
+            addLog("Target has been defeated!");
+
+            if (target.components.isPlayer) {
+              setState(
+                (state: State) => (state.gameState = GameState.GAME_OVER)
+              );
+              addLog("Game Over!");
+            }
+
+            removeComponent(target.id, ComponentTypes.Ai);
+            removeComponent(target.id, ComponentTypes.IsBlocking);
           }
         }
 
-        return // console.log("you can go no further");
+        return; // console.log("you can go no further");
       }
     }
 
