@@ -102,7 +102,7 @@ const state: State = {
     smell: "You smell nothing.",
     taste: "You taste nothing.",
   },
-  legend: []
+  legend: [],
 };
 
 window.skulltooth.state = state;
@@ -260,10 +260,7 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xeeeeee],
     alphas: [1],
-  }).updateRows([
-    [{string: "(arrows / hjkl) Move"}],
-    []
-  ]);
+  }).updateRows([[], [{ string: "(arrows / hjkl) Move" }]]);
 
   setState((state: State) => {
     state.views.fps = fpsView;
