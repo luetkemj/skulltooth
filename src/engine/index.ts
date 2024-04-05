@@ -6,6 +6,11 @@ type AppearanceComponent = {
   tileSet: string;
 };
 
+type HealthComponent = {
+  max: number;
+  current: number;
+};
+
 type PositionComponent = {
   x: number;
   y: number;
@@ -21,11 +26,16 @@ type TryMoveComponent = {
 export enum ComponentTypes {
   Ai = "ai",
   Appearance = "appearance",
+  Health = 'health',
   IsBlocking = "isBlocking",
   IsInFov = "isInFov",
   IsOpaque = "isOpaque",
   IsPlayer = "isPlayer",
   IsRevealed = "isRevealed",
+  Layer100 = "layer100",
+  Layer200 = "layer200",
+  Layer300 = "layer300",
+  Name = "name",
   PathThrough = "pathThrough",
   Position = "position",
   TryMove = "tryMove",
@@ -34,6 +44,7 @@ export enum ComponentTypes {
 export type Components = {
   ai?: {},
   appearance?: AppearanceComponent;
+  health?: HealthComponent;
   isBlocking?: {};
   isInFov?: {};
   isOpaque?: {};
@@ -42,6 +53,7 @@ export type Components = {
   layer100?: {}; // ground layer
   layer200?: {}; // item layer
   layer300?: {}; // actor layer
+  name?: String;
   pathThrough?: {};
   position?: PositionComponent;
   tryMove?: TryMoveComponent;

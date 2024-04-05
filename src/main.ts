@@ -27,6 +27,11 @@ const enum Turn {
   WORLD = "WORLD",
 }
 
+export const enum GameState {
+  GAME = "GAME",
+  GAME_OVER = "GAME_OVER",
+}
+
 type EAP = { [key: string]: EIds };
 
 export type State = {
@@ -38,12 +43,24 @@ export type State = {
   views: {
     fps?: View;
     map?: View;
+    log?: View;
+    senses?: View;
   };
   wId: WId;
   playerEId: EId;
   z: number;
+  gameState: GameState;
+  log: Array<string>;
+  senses: {
+    feel: string;
+    see: string;
+    hear: string;
+    smell: string;
+    taste: string;
+  };
 };
 
+// for debugging
 declare global {
   interface Window {
     skulltooth: {
@@ -67,6 +84,21 @@ const state: State = {
   wId: "",
   playerEId: "",
   z: 0,
+  gameState: GameState.GAME,
+  log: [
+    "Welcome to Skulltooth! Your destiny awaits and we will keep describingthat for a long time!",
+    "The skulltooth awaits",
+    "Seek it's wisdom if you dare",
+    "Use your senses to survive",
+    "Good luck...",
+  ],
+  senses: {
+    feel: "You feel nothing.",
+    see: "You see nothing.",
+    hear: "You hear nothing.",
+    smell: "You smell nothing.",
+    taste: "You taste nothing.",
+  },
 };
 
 window.skulltooth.state = state;
@@ -100,6 +132,10 @@ export const removeEAP = (entity: Entity): State => {
   }
 
   return state;
+};
+
+export const addLog = (message: string) => {
+  state.log.push(message);
 };
 
 const init = async () => {
@@ -140,6 +176,28 @@ const init = async () => {
     [{ tint: 0xff0077 }, { string: "forcecrusher", tint: 0xffffff }],
   ]);
 
+  const logView = new View({
+    width: 74,
+    height: 5,
+    x: 26,
+    y: 0,
+    layers: 1,
+    tileSets: ["text"],
+    tints: [0xeeeeee],
+    alphas: [1],
+  });
+
+  const sensesView = new View({
+    width: 74,
+    height: 5,
+    x: 100,
+    y: 0,
+    layers: 1,
+    tileSets: ["text"],
+    tints: [0xff0077],
+    alphas: [1],
+  });
+
   // 3 render layers
   // 1: background
   // 2: character
@@ -148,7 +206,7 @@ const init = async () => {
     width: 74,
     height: 39,
     x: 13,
-    y: 3,
+    y: 5,
     layers: 3,
     tileSets: ["tile", "ascii", "tile"],
     tints: [0x000000, 0x000000, 0x000000],
@@ -159,7 +217,7 @@ const init = async () => {
     width: 12,
     height: 1,
     x: 0,
-    y: 42,
+    y: 44,
     layers: 1,
     tileSets: ["text"],
     tints: [0xdddddd],
@@ -170,7 +228,7 @@ const init = async () => {
     width: 12,
     height: 1,
     x: 0,
-    y: 43,
+    y: 45,
     layers: 1,
     tileSets: ["text"],
     tints: [0xffffff],
@@ -180,11 +238,19 @@ const init = async () => {
   setState((state: State) => {
     state.views.fps = fpsView;
     state.views.map = mapView;
+    state.views.log = logView;
+    state.views.senses = sensesView;
   });
 
   const start = dungeon!.rooms[0].center;
   const goal = dungeon!.rooms[1].center;
   aStar(start, goal);
+
+  // initialize some systems at game start
+  {
+    fovSystem();
+    renderSystem();
+  }
 
   gameLoop();
 
@@ -204,7 +270,7 @@ const init = async () => {
 
     if (!state.eAP[posId]) return;
 
-    if (window.skulltooth.debug === true) {
+    if (window.skulltooth.debug === true || import.meta.env.DEV) {
       state.eAP[posId].forEach((eId) => {
         console.log(getEntity(eId));
       });
@@ -219,27 +285,35 @@ let fpsSamples: Array<Number> = [];
 function gameLoop() {
   requestAnimationFrame(gameLoop);
 
-  // systems
-  if (getState().userInput && getState().turn === Turn.PLAYER) {
-    userInputSystem();
-    movementSystem();
-    fovSystem();
-    renderSystem();
+  if (getState().gameState === GameState.GAME) {
+    // systems
+    if (getState().userInput && getState().turn === Turn.PLAYER) {
+      userInputSystem();
+      movementSystem();
+      fovSystem();
+      renderSystem();
 
-    setState((state: State) => {
-      state.turn = Turn.WORLD;
-    });
+      setState((state: State) => {
+        state.turn = Turn.WORLD;
+      });
+    }
+
+    if (getState().turn === Turn.WORLD) {
+      aiSystem();
+      movementSystem();
+      fovSystem();
+      renderSystem();
+
+      setState((state: State) => {
+        state.turn = Turn.PLAYER;
+      });
+    }
   }
 
-  if (getState().turn === Turn.WORLD) {
-    aiSystem();
-    movementSystem();
-    fovSystem();
-    renderSystem();
-
-    setState((state: State) => {
-      state.turn = Turn.PLAYER;
-    });
+  if (getState().gameState === GameState.GAME_OVER) {
+    // systems
+    // THE GAME IS OVER
+    // console.log('game over')
   }
 
   // Track FPS

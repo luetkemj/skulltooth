@@ -7,21 +7,29 @@ export const renderable: Components = {
     tileSet: "ascii",
   },
   position: { x: 0, y: 0, z: 0 },
+  name: 'unnamed',
 };
 
 export const tile: Components = {
   layer100: {},
+  name: 'unnamed',
 };
 
 export const blockingTile: Components = {
-  layer100: {},
   isBlocking: {},
   isOpaque: {},
+  layer100: {},
+  name: 'unnamed',
 };
 
 export const being: Components = {
-  layer200: {},
+  health: {
+    max: 10,
+    current: 10,
+  },
   isBlocking: {},
+  layer200: {},
+  name: 'unnamed',
 };
 
 export const mob: Components = {
