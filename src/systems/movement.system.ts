@@ -1,5 +1,6 @@
 import {
   ComponentTypes,
+  Entity,
   getEntity,
   getQuery,
   removeComponent,
@@ -16,14 +17,27 @@ import {
 } from "../main";
 import { QueryTypes } from "../queries";
 
-export const movementSystem = () => {
-  const query = getQuery(QueryTypes.IsTryingToMove);
+const moveEntity = (entity: Entity) => {
+  const { x, y, z } = entity.components.tryMove!;
+  removeComponent(entity.id, ComponentTypes.TryMove);
 
-  query.entities.forEach((eId) => {
+  removeEAP(entity);
+
+  entity.components.position!.x = x;
+  entity.components.position!.y = y;
+  entity.components.position!.z = z;
+
+  addEAP(entity);
+};
+
+export const movementSystem = () => {
+  const isTryingToMoveQuery = getQuery(QueryTypes.IsTryingToMove);
+
+  isTryingToMoveQuery.entities.forEach((eId) => {
     const entity = getEntity(eId);
     if (!entity) return;
 
-    const { x, y, z } = entity.components.tryMove!;
+    const { x, y, } = entity.components.tryMove!;
 
     // respect map boundaries
     const { width, height } = getState().views.map!;
@@ -33,16 +47,20 @@ export const movementSystem = () => {
     const posId = toPosId(entity.components.tryMove!);
     const eAP = getState().eAP[posId];
 
-    for (const eId of eAP) {
-      const target = getEntity(eId);
+    for (const targetEId of eAP) {
+      const target = getEntity(targetEId);
       if (target?.components.isBlocking) {
         if (target?.components.health) {
           target.components.health.current -= 5;
-          addLog("Target has been hit for 5 damage");
+          addLog(
+            `${entity.components.name} hits ${target.components.name} for 5 damage!`
+          );
 
           if (target.components.health.current <= 0) {
             target.components.appearance!.char = "%";
-            addLog("Target has been defeated!");
+            addLog(
+              `${target.components.name} has been defeated by ${entity.components.name}!`
+            );
 
             if (target.components.isPlayer) {
               setState(
@@ -56,22 +74,13 @@ export const movementSystem = () => {
           }
         }
 
-        return; // console.log("you can go no further");
+        // target is blocking so entity cannot move.
+        removeComponent(entity.id, ComponentTypes.TryMove);
+        return;
       }
     }
 
-    removeComponent(eId, ComponentTypes.TryMove);
-
-    // if everything checks out - update position
-    // should we set this new location to toRender in state?
-    // pretty sure - looks like we're just hacking the render system for now
-
-    removeEAP(entity);
-
-    entity.components.position!.x = x;
-    entity.components.position!.y = y;
-    entity.components.position!.z = z;
-
-    addEAP(entity);
+    // Everything checks - go ahead and move
+    moveEntity(entity);
   });
 };

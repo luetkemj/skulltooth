@@ -4,7 +4,7 @@ import { aStar } from "../lib/pathfinding";
 
 export const aiSystem = () => {
   const isPlayerQuery = getQuery(QueryTypes.IsPlayer);
-  const query = getQuery(QueryTypes.HasAi);
+  const hasAiQuery = getQuery(QueryTypes.HasAi);
 
   let player: Entity;
   isPlayerQuery.entities.forEach((eId) => {
@@ -14,14 +14,14 @@ export const aiSystem = () => {
     player = entity;
   });
 
-  query.entities.forEach((eId) => {
+  hasAiQuery.entities.forEach((eId) => {
     const entity = getEntity(eId);
     if (!entity?.components.position) return;
     if (!player?.components.position) return;
 
     const path = aStar(entity.components.position, player.components.position);
     
-    // if not path was found we should bail
+    // if no path was found we should bail
     if (!path[1]) return
 
     const newPos = {
