@@ -32,4 +32,5 @@ This is aspirational only. Expect anything and everything in this document to be
 - [ ]  Sensory System
 - [ ]  Overworld map with multiple dungeons to explore
 - [ ]  Crafting
+- [ ]  color coded logs (ale-dsi/brogue-esque)
 
