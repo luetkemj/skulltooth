@@ -9,7 +9,7 @@ export const createFloor = (wId: WId, position?: Pos) => {
   addPrefabs(entity.id, [renderable, tile]);
 
   entity.components.appearance!.char = "•";
-  entity.components.name = 'floor';
+  entity.components.name = "floor";
 
   if (position) {
     addComponent(entity.id, { position });
@@ -25,7 +25,7 @@ export const createWall = (wId: WId, position?: Pos) => {
 
   entity.components.appearance!.char = "#";
   entity.components.appearance!.tint = 0x808080;
-  entity.components.name = 'wall';
+  entity.components.name = "wall";
 
   if (position) {
     addComponent(entity.id, { position });
@@ -47,12 +47,9 @@ export const createPlayer = (wId: WId, position?: Pos) => {
       tileSet: "ascii",
     },
     isPlayer: {},
-    eyes: { range: 10 },
-    species: "human",
-    name: 'player',
+    name: "player",
   });
 
-  
   if (position) {
     addComponent(entity.id, { position });
     addEAP(entity);
@@ -72,8 +69,7 @@ export const createOwlbear = (wId: WId, position?: Pos) => {
       tint: 0xff0088,
       tileSet: "ascii",
     },
-    species: "owlbear",
-    name: 'owlbear'
+    name: "owlbear",
   });
 
   if (position) {

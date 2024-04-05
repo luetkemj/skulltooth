@@ -1,7 +1,7 @@
 import { State, getState, setState } from "../main";
 import { getEntity, getQuery } from "../engine";
 import { QueryTypes } from "../queries";
-import { toPos, UpdateRow } from "../lib/grid";
+import { toPos } from "../lib/grid";
 
 // this is not doing anything to reduce the cells that need to be rendered.
 // if things slow down or we run into other issues we will need to expand onor use the toRender info from state - not really using that yet.
