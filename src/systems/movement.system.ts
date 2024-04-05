@@ -17,6 +17,40 @@ import {
 } from "../main";
 import { QueryTypes } from "../queries";
 
+export const movementSystem = () => {
+  const isTryingToMoveQuery = getQuery(QueryTypes.IsTryingToMove);
+
+  isTryingToMoveQuery.entities.forEach((eId) => {
+    const entity = getEntity(eId);
+
+    // check that entity exists
+    if (!entity) return;
+
+    // respect map boundaries
+    if (outOfBounds(entity)) return;
+
+    // get all eIds of entities at position of trymove goal
+    const posId = toPosId(entity.components.tryMove!);
+    const eAP = getState().eAP[posId];
+
+    for (const targetEId of eAP) {
+      const target = getEntity(targetEId);
+
+      if (target?.components.isBlocking) {
+        // try to fight target
+        tryFight(entity, target);
+
+        // target is blocking so entity cannot move.
+        removeComponent(entity.id, ComponentTypes.TryMove);
+        return;
+      }
+    }
+
+    // Everything checks - go ahead and move
+    moveEntity(entity);
+  });
+};
+
 const moveEntity = (entity: Entity) => {
   const { x, y, z } = entity.components.tryMove!;
   removeComponent(entity.id, ComponentTypes.TryMove);
@@ -30,57 +64,41 @@ const moveEntity = (entity: Entity) => {
   addEAP(entity);
 };
 
-export const movementSystem = () => {
-  const isTryingToMoveQuery = getQuery(QueryTypes.IsTryingToMove);
+const outOfBounds = (entity: Entity) => {
+  const { x, y } = entity.components.tryMove!;
+  const { width, height } = getState().views.map!;
+  return x < 0 || y < 0 || x >= width || y >= height;
+};
 
-  isTryingToMoveQuery.entities.forEach((eId) => {
-    const entity = getEntity(eId);
-    if (!entity) return;
+const tryFight = (entity: Entity, target: Entity) => {
+  if (!target?.components.health) return;
 
-    const { x, y, } = entity.components.tryMove!;
+  target.components.health.current -= 5;
+  addLog(
+    `${entity.components.name} hits ${target.components.name} for 5 damage!`
+  );
 
-    // respect map boundaries
-    const { width, height } = getState().views.map!;
-    if (x < 0 || y < 0 || x >= width || y >= height) return;
+  if (target.components.health.current <= 0) {
+    kill(target, entity);
+  }
+};
 
-    // check entities at goal position
-    const posId = toPosId(entity.components.tryMove!);
-    const eAP = getState().eAP[posId];
+const kill = (target: Entity, entity: Entity) => {
+  target.components.appearance!.char = "%";
 
-    for (const targetEId of eAP) {
-      const target = getEntity(targetEId);
-      if (target?.components.isBlocking) {
-        if (target?.components.health) {
-          target.components.health.current -= 5;
-          addLog(
-            `${entity.components.name} hits ${target.components.name} for 5 damage!`
-          );
+  addLog(
+    `${target.components.name} has been defeated by ${entity.components.name}!`
+  );
 
-          if (target.components.health.current <= 0) {
-            target.components.appearance!.char = "%";
-            addLog(
-              `${target.components.name} has been defeated by ${entity.components.name}!`
-            );
+  if (target.components.isPlayer) {
+    endGame();
+  }
 
-            if (target.components.isPlayer) {
-              setState(
-                (state: State) => (state.gameState = GameState.GAME_OVER)
-              );
-              addLog("Game Over!");
-            }
+  removeComponent(target.id, ComponentTypes.Ai);
+  removeComponent(target.id, ComponentTypes.IsBlocking);
+};
 
-            removeComponent(target.id, ComponentTypes.Ai);
-            removeComponent(target.id, ComponentTypes.IsBlocking);
-          }
-        }
-
-        // target is blocking so entity cannot move.
-        removeComponent(entity.id, ComponentTypes.TryMove);
-        return;
-      }
-    }
-
-    // Everything checks - go ahead and move
-    moveEntity(entity);
-  });
+const endGame = () => {
+  setState((state: State) => (state.gameState = GameState.GAME_OVER));
+  addLog("Game Over!");
 };
