@@ -35,6 +35,7 @@ export enum ComponentTypes {
   Layer100 = "layer100",
   Layer200 = "layer200",
   Layer300 = "layer300",
+  Legendable = 'legendable',
   Name = "name",
   PathThrough = "pathThrough",
   Position = "position",
@@ -53,6 +54,7 @@ export type Components = {
   layer100?: {}; // ground layer
   layer200?: {}; // item layer
   layer300?: {}; // actor layer
+  legendable?: {};
   name?: String;
   pathThrough?: {};
   position?: PositionComponent;

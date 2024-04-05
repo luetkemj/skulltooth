@@ -1,7 +1,7 @@
 import { State, getState, setState } from "../main";
 import { getEntity, getQuery } from "../engine";
 import { QueryTypes } from "../queries";
-import { toPos } from "../lib/grid";
+import { toPos, UpdateRow } from "../lib/grid";
 
 // this is not doing anything to reduce the cells that need to be rendered.
 // if things slow down or we run into other issues we will need to expand onor use the toRender info from state - not really using that yet.
@@ -32,7 +32,12 @@ export const renderSystem = () => {
   const isRevealed = getQuery(QueryTypes.IsRevealed);
   const isPlayer = getQuery(QueryTypes.IsPlayer);
 
-  const { map: mapView, log: logView, senses: sensesView } = getState().views;
+  const {
+    map: mapView,
+    log: logView,
+    senses: sensesView,
+    legend: legendView,
+  } = getState().views;
 
   for (const eId of isRevealed.entities) {
     const entity = getEntity(eId);
@@ -129,5 +134,23 @@ export const renderSystem = () => {
       [{ string: concatRow(senses.smell, width) }],
       [{ string: concatRow(senses.taste, width) }],
     ]);
+  }
+
+  // render legend
+  {
+    legendView?.clearView();
+    const legend = getState().legend;
+
+    const rows:Array<Array<UpdateRow>> = []
+    legend.forEach(eId => {
+      const entity = getEntity(eId)
+      const entityChar = entity?.components.appearance?.char;
+      const entityName = entity?.components.name;
+
+      const string = `${entityChar} ${entityName}`;
+      rows.push([{string}])
+    })
+    
+    legendView?.updateRows(rows);
   }
 };

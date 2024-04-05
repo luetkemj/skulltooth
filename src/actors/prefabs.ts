@@ -30,9 +30,11 @@ export const being: Components = {
   isBlocking: {},
   layer200: {},
   name: 'unnamed',
+  legendable: {},
 };
 
 export const mob: Components = {
   ai: {},
   pathThrough: {},
+  legendable: {},
 };

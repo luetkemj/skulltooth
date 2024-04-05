@@ -109,7 +109,7 @@ interface UpdateSprite {
   alpha: number;
 }
 
-interface UpdateRow {
+export interface UpdateRow {
   string?: string;
   layer?: number;
   x?: number;
@@ -249,7 +249,7 @@ export class View {
   updateSprite = async (opts: UpdateSprite) => {
     const { char = "", layer, x, y, tileSet = "text", tint, alpha } = opts;
     const sprite = this.sprites[layer][y][x];
-    if (!sprite) return
+    if (!sprite) return;
 
     sprite.texture = this._getTexture({ tileSet, char });
     if (tint) sprite.tint = tint;
@@ -259,11 +259,10 @@ export class View {
   };
 
   updateRows = (opts: Array<Array<UpdateRow>>) => {
-    const eraser = new Array(this.width + 1).join(" ");
     opts.forEach((rows, rowIndex) => {
       rows.forEach((rowLayer, layerIndex) => {
         // clear row before writing to it
-        this.updateRow({ string: eraser, layer: layerIndex, y: rowIndex });
+        this.clearRow(layerIndex, rowIndex);
         this.updateRow({ ...rowLayer, layer: layerIndex, y: rowIndex });
       });
     });
@@ -299,5 +298,22 @@ export class View {
       });
 
     return this;
+  };
+
+  clearRow = (layer: number, row: number) => {
+    const eraser = new Array(this.width + 1).join(" ");
+    this.updateRow({ string: eraser, layer: layer, y: row });
+  };
+
+  clearView = () => {
+    let layerIndex: number = 0;
+    this.layers.forEach(() => {
+      /* tslint:disable:no-unused-variable */
+      _.times(this.height, (rowIndex) => {
+        this.clearRow(layerIndex, rowIndex);
+      });
+
+      layerIndex += 1;
+    });
   };
 }

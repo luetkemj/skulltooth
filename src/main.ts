@@ -1,11 +1,12 @@
 import { mean } from "lodash";
 import { pxToPosId, setupCanvas, View } from "./lib/canvas";
 import "./style.css";
-import { userInputSystem } from "./systems/userInput.system";
 import { aiSystem } from "./systems/ai.system";
-import { renderSystem } from "./systems/render.system";
-import { movementSystem } from "./systems/movement.system";
 import { fovSystem } from "./systems/fov.system";
+import { legendSystem } from "./systems/legend.system";
+import { movementSystem } from "./systems/movement.system";
+import { renderSystem } from "./systems/render.system";
+import { userInputSystem } from "./systems/userInput.system";
 import {
   type WId,
   type EId,
@@ -45,6 +46,7 @@ export type State = {
     map?: View;
     log?: View;
     senses?: View;
+    legend?: View;
   };
   wId: WId;
   playerEId: EId;
@@ -58,6 +60,7 @@ export type State = {
     smell: string;
     taste: string;
   };
+  legend: Array<string>;
 };
 
 // for debugging
@@ -99,6 +102,7 @@ const state: State = {
     smell: "You smell nothing.",
     taste: "You taste nothing.",
   },
+  legend: []
 };
 
 window.skulltooth.state = state;
@@ -176,6 +180,17 @@ const init = async () => {
     [{ tint: 0xff0077 }, { string: "forcecrusher", tint: 0xffffff }],
   ]);
 
+  const legendView = new View({
+    width: 25,
+    height: 42,
+    x: 0,
+    y: 2,
+    layers: 1,
+    tileSets: ["text"],
+    tints: [0xff0077],
+    alphas: [1],
+  });
+
   const logView = new View({
     width: 74,
     height: 5,
@@ -235,11 +250,27 @@ const init = async () => {
     alphas: [1],
   }).updateRows([[{ string: "TAG: GITHASH" }]]);
 
+  // keyboard controls
+  new View({
+    width: 148,
+    height: 2,
+    x: 26,
+    y: 44,
+    layers: 1,
+    tileSets: ["text"],
+    tints: [0xeeeeee],
+    alphas: [1],
+  }).updateRows([
+    [{string: "(arrows / hjkl) Move"}],
+    []
+  ]);
+
   setState((state: State) => {
     state.views.fps = fpsView;
     state.views.map = mapView;
     state.views.log = logView;
     state.views.senses = sensesView;
+    state.views.legend = legendView;
   });
 
   const start = dungeon!.rooms[0].center;
@@ -249,6 +280,7 @@ const init = async () => {
   // initialize some systems at game start
   {
     fovSystem();
+    legendSystem();
     renderSystem();
   }
 
@@ -291,6 +323,7 @@ function gameLoop() {
       userInputSystem();
       movementSystem();
       fovSystem();
+      legendSystem();
       renderSystem();
 
       setState((state: State) => {
@@ -302,6 +335,7 @@ function gameLoop() {
       aiSystem();
       movementSystem();
       fovSystem();
+      legendSystem();
       renderSystem();
 
       setState((state: State) => {

@@ -11,9 +11,9 @@ This is aspirational only. Expect anything and everything in this document to be
 - [x] Field of view
 - [x] Placing enemies and kicking them (harmlessly)
 - [x] Doing (and taking) some damage
-- [ ] Creating the Interface
-   - [ ]  Legend
-   - [ ]  Controls list
+- [x] Creating the Interface
+   - [x]  Legend
+   - [x]  Controls list
 - [ ] Items and Inventory
     - [ ] Item entities
     - [ ]  Inventory
@@ -33,4 +33,5 @@ This is aspirational only. Expect anything and everything in this document to be
 - [ ]  Overworld map with multiple dungeons to explore
 - [ ]  Crafting
 - [ ]  color coded logs (ale-dsi/brogue-esque)
+    - [ ] support writing mutiple colors to a text row
 
