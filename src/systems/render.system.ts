@@ -2,6 +2,7 @@ import { State, getState, setState } from "../main";
 import { getEntity, getQuery } from "../engine";
 import { QueryTypes } from "../queries";
 import { toPos } from "../lib/grid";
+import { UpdateRow } from "../lib/canvas";
 
 // this is not doing anything to reduce the cells that need to be rendered.
 // if things slow down or we run into other issues we will need to expand onor use the toRender info from state - not really using that yet.
@@ -141,16 +142,16 @@ export const renderSystem = () => {
     legendView?.clearView();
     const legend = getState().legend;
 
-    const rows:Array<Array<UpdateRow>> = []
-    legend.forEach(eId => {
-      const entity = getEntity(eId)
+    const rows: Array<Array<UpdateRow>> = [];
+    legend.forEach((eId) => {
+      const entity = getEntity(eId);
       const entityChar = entity?.components.appearance?.char;
       const entityName = entity?.components.name;
 
       const string = `${entityChar} ${entityName}`;
-      rows.push([{string}])
-    })
-    
+      rows.push([{ string }]);
+    });
+
     legendView?.updateRows(rows);
   }
 };
