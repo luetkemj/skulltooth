@@ -32,6 +32,7 @@ const enum Turn {
 export const enum GameState {
   GAME = "GAME",
   GAME_OVER = "GAME_OVER",
+  INVENTORY = "INVENTORY",
 }
 
 type EAP = { [key: string]: EIds };
@@ -319,6 +320,15 @@ let fpsSamples: Array<Number> = [];
 
 function gameLoop() {
   requestAnimationFrame(gameLoop);
+  
+  if (getState().gameState === GameState.INVENTORY) {
+    if (getState().userInput && getState().turn === Turn.PLAYER) {
+      userInputSystem();
+      fovSystem();
+      legendSystem();
+      renderSystem();
+    }
+  }
 
   if (getState().gameState === GameState.GAME) {
     // systems
