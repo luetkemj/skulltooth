@@ -1,7 +1,7 @@
-import { type WId, addComponent, addPrefabs, createEntity } from "../engine";
+import { type WId, ComponentTypes, addComponent, addPrefabs, removeComponent, createEntity } from "../engine";
 import { addEAP } from "../main";
 import { Pos } from "../lib/grid";
-import { renderable, tile, blockingTile, being, mob } from "../actors/prefabs";
+import { renderable, tile, blockingTile, being, mob, item } from "../actors/prefabs";
 
 export const createFloor = (wId: WId, position?: Pos) => {
   const entity = createEntity({ wId });
@@ -48,6 +48,7 @@ export const createPlayer = (wId: WId, position?: Pos) => {
     },
     isPlayer: {},
     name: "player",
+    inventory: new Set,
   });
 
   if (position) {
@@ -76,6 +77,31 @@ export const createOwlbear = (wId: WId, position?: Pos) => {
     addComponent(entity.id, { position });
     addEAP(entity);
   }
+
+  return entity;
+};
+
+export const createItem = (wId: WId, position?: Pos) => {
+  const entity = createEntity({ wId });
+
+  addPrefabs(entity.id, [renderable, item]);
+
+  addComponent(entity.id, {
+    appearance: {
+      char: "?",
+      tint: 0xff0088,
+      tileSet: "ascii",
+    },
+    name: "item",
+  });
+
+  if (position) {
+    addComponent(entity.id, { position });
+    addEAP(entity);
+  } else {
+    removeComponent(entity.id, ComponentTypes.Position)
+  }
+
 
   return entity;
 };

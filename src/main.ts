@@ -16,10 +16,11 @@ import {
   getEngine,
   getEntity,
 } from "./engine";
-import { createOwlbear, createPlayer } from "./actors";
+import { createItem, createOwlbear, createPlayer } from "./actors";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
 import { toPosId } from "./lib/grid";
+import { addItem } from './lib/inventory';
 
 import { aStar } from "./lib/pathfinding";
 
@@ -69,6 +70,7 @@ declare global {
     skulltooth: {
       state: State;
       getEngine: Function;
+      getEntity: Function;
       debug: Boolean;
     };
   }
@@ -76,6 +78,7 @@ declare global {
 window.skulltooth = window.skulltooth || {};
 window.skulltooth.getEngine = () => getEngine();
 window.skulltooth.debug = false;
+window.skulltooth.getEntity = (eId:string) => getEntity(eId);
 
 const state: State = {
   eAP: {},
@@ -159,6 +162,9 @@ const init = async () => {
   setState((state: State) => {
     state.playerEId = player.id;
   });
+
+  const item = createItem(getState().wId);
+  addItem(item.id, player.id)
 
   dungeon!.rooms.forEach((room, index) => {
     if (index) {

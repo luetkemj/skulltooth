@@ -33,6 +33,11 @@ export const being: Components = {
   legendable: {},
 };
 
+export const item: Components = {
+  layer200: {},
+  legendable: {},
+};
+
 export const mob: Components = {
   ai: {},
   pathThrough: {},

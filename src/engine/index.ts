@@ -11,6 +11,8 @@ type HealthComponent = {
   current: number;
 };
 
+type InventoryComponent = EIds;
+
 type PositionComponent = {
   x: number;
   y: number;
@@ -27,6 +29,7 @@ export enum ComponentTypes {
   Ai = "ai",
   Appearance = "appearance",
   Health = 'health',
+  Inventory = "inventory",
   IsBlocking = "isBlocking",
   IsInFov = "isInFov",
   IsOpaque = "isOpaque",
@@ -46,6 +49,7 @@ export type Components = {
   ai?: {},
   appearance?: AppearanceComponent;
   health?: HealthComponent;
+  inventory?: InventoryComponent;
   isBlocking?: {};
   isInFov?: {};
   isOpaque?: {};
