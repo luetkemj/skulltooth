@@ -1,4 +1,4 @@
-import { State, getState, setState } from "../main";
+import { State, getState, setState, GameState } from "../main";
 import { getEntity, getQuery } from "../engine";
 import { QueryTypes } from "../queries";
 import { toPos } from "../lib/grid";
@@ -29,18 +29,20 @@ const getAlpha = (index: number) => {
 };
 
 export const renderSystem = () => {
-  const inFov = getQuery(QueryTypes.IsInFov);
-  const isRevealed = getQuery(QueryTypes.IsRevealed);
-  const isPlayer = getQuery(QueryTypes.IsPlayer);
+  const inFovQuery = getQuery(QueryTypes.IsInFov);
+  const isRevealedQuery = getQuery(QueryTypes.IsRevealed);
+  const isPlayerQuery = getQuery(QueryTypes.IsPlayer);
 
   const {
     map: mapView,
     log: logView,
     senses: sensesView,
     legend: legendView,
+    inventory: inventoryView,
+    overlay: overlayView,
   } = getState().views;
 
-  for (const eId of isRevealed.entities) {
+  for (const eId of isRevealedQuery.entities) {
     const entity = getEntity(eId);
     if (!entity) return;
 
@@ -53,7 +55,7 @@ export const renderSystem = () => {
     });
   }
 
-  for (const eId of inFov.entities) {
+  for (const eId of inFovQuery.entities) {
     const entity = getEntity(eId);
     if (!entity) return;
 
@@ -66,7 +68,7 @@ export const renderSystem = () => {
     });
   }
 
-  for (const eId of isPlayer.entities) {
+  for (const eId of isPlayerQuery.entities) {
     const entity = getEntity(eId);
     if (!entity) return;
 
@@ -152,6 +154,43 @@ export const renderSystem = () => {
       rows.push([{ string }]);
     });
 
+    console.log(rows)
+
     legendView?.updateRows(rows);
+  }
+
+  // render inventory
+  {
+    if (getState().gameState === GameState.INVENTORY) {
+      overlayView?.show();
+      inventoryView?.show();
+
+      // actually render the inventory
+      // get player entity
+      const [playerEId] = isPlayerQuery.entities;
+      const playerEntity = getEntity(playerEId);
+      if (!playerEntity) return;
+
+      const rows: Array<Array<UpdateRow>> = [];
+      const itemsInInventory = [...playerEntity.components.inventory].map(
+        (eId) => getEntity(eId)
+      );
+
+      itemsInInventory.forEach((item) => {
+        rows.push([
+          {},
+          {
+            string: `${item?.components.appearance?.char} ${item?.components.name}`,
+          },
+        ]);
+      });
+
+      console.log(rows)
+
+      inventoryView?.updateRows(rows);
+    } else {
+      overlayView?.hide();
+      inventoryView?.hide();
+    }
   }
 };

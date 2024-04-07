@@ -20,7 +20,7 @@ import { createItem, createOwlbear, createPlayer } from "./actors";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
 import { toPosId } from "./lib/grid";
-import { addItem } from './lib/inventory';
+import { addItem } from "./lib/inventory";
 
 import { aStar } from "./lib/pathfinding";
 
@@ -49,6 +49,8 @@ export type State = {
     log?: View;
     senses?: View;
     legend?: View;
+    inventory?: View;
+    overlay?: View;
   };
   wId: WId;
   playerEId: EId;
@@ -79,7 +81,7 @@ declare global {
 window.skulltooth = window.skulltooth || {};
 window.skulltooth.getEngine = () => getEngine();
 window.skulltooth.debug = false;
-window.skulltooth.getEntity = (eId:string) => getEntity(eId);
+window.skulltooth.getEntity = (eId: string) => getEntity(eId);
 
 const state: State = {
   eAP: {},
@@ -165,7 +167,7 @@ const init = async () => {
   });
 
   const item = createItem(getState().wId);
-  addItem(item.id, player.id)
+  addItem(item.id, player.id);
 
   dungeon!.rooms.forEach((room, index) => {
     if (index) {
@@ -182,6 +184,7 @@ const init = async () => {
     tileSets: ["tile", "text"],
     tints: [0xffffff, 0xff0077],
     alphas: [1, 1],
+    visible: true,
   }).updateRows([
     [{}, { string: " skulltooth" }],
     [{ tint: 0xff0077 }, { string: "forcecrusher", tint: 0xffffff }],
@@ -196,6 +199,7 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xff0077],
     alphas: [1],
+    visible: true,
   });
 
   const logView = new View({
@@ -207,6 +211,7 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xeeeeee],
     alphas: [1],
+    visible: true,
   });
 
   const sensesView = new View({
@@ -218,6 +223,7 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xff0077],
     alphas: [1],
+    visible: true,
   });
 
   // 3 render layers
@@ -233,6 +239,7 @@ const init = async () => {
     tileSets: ["tile", "ascii", "tile"],
     tints: [0x000000, 0x000000, 0x000000],
     alphas: [1, 1, 0],
+    visible: true,
   });
 
   const fpsView = new View({
@@ -244,6 +251,7 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xdddddd],
     alphas: [1],
+    visible: true,
   }).updateRows([[{ string: "FPS: calc..." }]]);
 
   new View({
@@ -255,6 +263,7 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xffffff],
     alphas: [1],
+    visible: true,
   }).updateRows([[{ string: "TAG: GITHASH" }]]);
 
   // keyboard controls
@@ -267,7 +276,35 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xeeeeee],
     alphas: [1],
-  }).updateRows([[], [{ string: "(arrows / hjkl) Move" }]]);
+    visible: true,
+  }).updateRows([[], [{ string: "(arrows / hjkl) Move (i) Inventory" }]]);
+
+  // MENUS
+  // menu overlay (goes over game view, below menu views)
+  const overlayView = new View({
+    width: 100,
+    height: 46,
+    x: 0,
+    y: 0,
+    layers: 1,
+    tileSets: ["tile"],
+    tints: [0x111111],
+    alphas: [0.75],
+    visible: false,
+  });
+
+  // Inventory Menu
+  const inventoryView = new View({
+    width: 148,
+    height: 39,
+    x: 26,
+    y: 5,
+    layers: 2,
+    tileSets: ["tile", "text"],
+    tints: [0x111111, 0xffffff],
+    alphas: [1],
+    visible: false,
+  });
 
   setState((state: State) => {
     state.views.fps = fpsView;
@@ -275,6 +312,8 @@ const init = async () => {
     state.views.log = logView;
     state.views.senses = sensesView;
     state.views.legend = legendView;
+    state.views.inventory = inventoryView;
+    state.views.overlay = overlayView;
   });
 
   const start = dungeon!.rooms[0].center;
@@ -320,7 +359,7 @@ let fpsSamples: Array<Number> = [];
 
 function gameLoop() {
   requestAnimationFrame(gameLoop);
-  
+
   if (getState().gameState === GameState.INVENTORY) {
     if (getState().userInput && getState().turn === Turn.PLAYER) {
       userInputSystem();

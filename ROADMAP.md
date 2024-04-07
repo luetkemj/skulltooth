@@ -15,9 +15,9 @@ This is aspirational only. Expect anything and everything in this document to be
    - [x]  Legend
    - [x]  Controls list
 - [ ] Items and Inventory
-    - [ ] Item entities
-    - [ ]  Inventory
-    - [ ]  Inventory UI
+    - [x] Item entities
+    - [x]  Inventory
+    - [x]  Inventory UI
     - [ ]  Pickup/Drop controls
     - [ ]  Containers
     - [ ]  AI for actors to use own inventory

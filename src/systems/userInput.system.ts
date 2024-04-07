@@ -59,7 +59,7 @@ export const userInputSystem = () => {
   }
 
   if (gameState === GameState.INVENTORY) {
-    if (key === "i") {
+    if (key === "i" || key === 'Escape') {
       setState((state: State) => (state.gameState = GameState.GAME));
     }
   }
