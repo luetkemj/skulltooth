@@ -164,8 +164,6 @@ export const renderSystem = () => {
   // render inventory
   {
     if (getState().gameState === GameState.INVENTORY) {
-      overlayView?.show();
-      inventoryView?.show();
 
       // actually render the inventory
       // get player entity
@@ -187,9 +185,11 @@ export const renderSystem = () => {
         ]);
       });
 
-      console.log(rows);
-
+      // console.log(rows);
+      overlayView?.show();
+      inventoryView?.clearView();
       inventoryView?.updateRows(rows);
+      inventoryView?.show();
     } else {
       overlayView?.hide();
       inventoryView?.hide();
