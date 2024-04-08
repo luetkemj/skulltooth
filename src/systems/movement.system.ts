@@ -6,15 +6,9 @@ import {
   removeComponent,
 } from "../engine";
 import { toPosId } from "../lib/grid";
-import {
-  addLog,
-  getState,
-  addEAP,
-  removeEAP,
-  setState,
-  GameState,
-  type State,
-} from "../main";
+import { updatePosition } from "../lib/utils";
+import { getState, setState, GameState, type State } from "../main";
+import { addLog } from "../lib/utils";
 import { QueryTypes } from "../queries";
 
 export const movementSystem = () => {
@@ -55,13 +49,7 @@ const moveEntity = (entity: Entity) => {
   const { x, y, z } = entity.components.tryMove!;
   removeComponent(entity.id, ComponentTypes.TryMove);
 
-  removeEAP(entity);
-
-  entity.components.position!.x = x;
-  entity.components.position!.y = y;
-  entity.components.position!.z = z;
-
-  addEAP(entity);
+  updatePosition(entity.id, { x, y, z });
 };
 
 const outOfBounds = (entity: Entity) => {

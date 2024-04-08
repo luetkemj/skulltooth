@@ -144,10 +144,6 @@ export const removeEAP = (entity: Entity): State => {
   return state;
 };
 
-export const addLog = (message: string) => {
-  state.log.push(message);
-};
-
 const init = async () => {
   await setupCanvas(document.querySelector<HTMLCanvasElement>("#canvas")!);
 
@@ -171,7 +167,8 @@ const init = async () => {
 
   dungeon!.rooms.forEach((room, index) => {
     if (index) {
-      createOwlbear(getState().wId, room.center);
+      // createOwlbear(getState().wId, room.center);
+      createItem(getState().wId, room.center);
     }
   });
 

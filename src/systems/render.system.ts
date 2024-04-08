@@ -55,6 +55,10 @@ export const renderSystem = () => {
     });
   }
 
+  // don't do it like this. 
+  // iterate over position in FOV
+  // then work through the EIds at each position
+  // eventually only go through the positions that have actually changed instead of all of them as we are now.
   for (const eId of inFovQuery.entities) {
     const entity = getEntity(eId);
     if (!entity) return;
@@ -154,8 +158,6 @@ export const renderSystem = () => {
       rows.push([{ string }]);
     });
 
-    console.log(rows)
-
     legendView?.updateRows(rows);
   }
 
@@ -185,7 +187,7 @@ export const renderSystem = () => {
         ]);
       });
 
-      console.log(rows)
+      console.log(rows);
 
       inventoryView?.updateRows(rows);
     } else {

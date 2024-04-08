@@ -28,7 +28,7 @@ type TryMoveComponent = {
 export enum ComponentTypes {
   Ai = "ai",
   Appearance = "appearance",
-  Health = 'health',
+  Health = "health",
   Inventory = "inventory",
   IsBlocking = "isBlocking",
   IsInFov = "isInFov",
@@ -38,15 +38,16 @@ export enum ComponentTypes {
   Layer100 = "layer100",
   Layer200 = "layer200",
   Layer300 = "layer300",
-  Legendable = 'legendable',
+  Legendable = "legendable",
   Name = "name",
   PathThrough = "pathThrough",
+  Pickup = "pickup",
   Position = "position",
   TryMove = "tryMove",
 }
 
 export type Components = {
-  ai?: {},
+  ai?: {};
   appearance?: AppearanceComponent;
   health?: HealthComponent;
   inventory?: InventoryComponent;
@@ -61,6 +62,7 @@ export type Components = {
   legendable?: {};
   name?: String;
   pathThrough?: {};
+  pickup?: {};
   position?: PositionComponent;
   tryMove?: TryMoveComponent;
 };

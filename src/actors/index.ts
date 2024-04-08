@@ -1,7 +1,21 @@
-import { type WId, ComponentTypes, addComponent, addPrefabs, removeComponent, createEntity } from "../engine";
+import {
+  type WId,
+  ComponentTypes,
+  addComponent,
+  addPrefabs,
+  removeComponent,
+  createEntity,
+} from "../engine";
 import { addEAP } from "../main";
 import { Pos } from "../lib/grid";
-import { renderable, tile, blockingTile, being, mob, item } from "../actors/prefabs";
+import {
+  renderable,
+  tile,
+  blockingTile,
+  being,
+  mob,
+  item,
+} from "../actors/prefabs";
 
 export const createFloor = (wId: WId, position?: Pos) => {
   const entity = createEntity({ wId });
@@ -48,7 +62,11 @@ export const createPlayer = (wId: WId, position?: Pos) => {
     },
     isPlayer: {},
     name: "player",
-    inventory: new Set,
+    inventory: new Set(),
+    health: {
+      max: 100,
+      current: 100,
+    },
   });
 
   if (position) {
@@ -99,9 +117,8 @@ export const createItem = (wId: WId, position?: Pos) => {
     addComponent(entity.id, { position });
     addEAP(entity);
   } else {
-    removeComponent(entity.id, ComponentTypes.Position)
+    removeComponent(entity.id, ComponentTypes.Position);
   }
-
 
   return entity;
 };

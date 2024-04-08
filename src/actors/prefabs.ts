@@ -36,6 +36,7 @@ export const being: Components = {
 export const item: Components = {
   layer200: {},
   legendable: {},
+  pickup: {},
 };
 
 export const mob: Components = {
