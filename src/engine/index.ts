@@ -35,9 +35,7 @@ export enum ComponentTypes {
   IsOpaque = "isOpaque",
   IsPlayer = "isPlayer",
   IsRevealed = "isRevealed",
-  Layer100 = "layer100",
-  Layer200 = "layer200",
-  Layer300 = "layer300",
+  Layer = "layer",
   Legendable = "legendable",
   Name = "name",
   PathThrough = "pathThrough",
@@ -56,9 +54,7 @@ export type Components = {
   isOpaque?: {};
   isPlayer?: {};
   isRevealed?: {};
-  layer100?: {}; // ground layer
-  layer200?: {}; // item layer
-  layer300?: {}; // actor layer
+  layer?: Number;
   legendable?: {};
   name?: String;
   pathThrough?: {};

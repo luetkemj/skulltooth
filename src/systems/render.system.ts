@@ -1,7 +1,7 @@
+import { sortBy } from "lodash";
 import { State, getState, setState, GameState } from "../main";
 import { getEntity, getQuery } from "../engine";
 import { QueryTypes } from "../queries";
-import { toPos } from "../lib/grid";
 import { UpdateRow } from "../lib/canvas";
 
 // this is not doing anything to reduce the cells that need to be rendered.
@@ -29,8 +29,6 @@ const getAlpha = (index: number) => {
 };
 
 export const renderSystem = () => {
-  const inFovQuery = getQuery(QueryTypes.IsInFov);
-  const isRevealedQuery = getQuery(QueryTypes.IsRevealed);
   const isPlayerQuery = getQuery(QueryTypes.IsPlayer);
 
   const {
@@ -42,80 +40,43 @@ export const renderSystem = () => {
     overlay: overlayView,
   } = getState().views;
 
-  for (const eId of isRevealedQuery.entities) {
-    const entity = getEntity(eId);
-    if (!entity) return;
+  for (const posId of getState().toRender) {
+    const eAP = getState().eAP[posId];
+    if (eAP) {
+      // sort entities at eap into a stack
+      const entities = [];
+      for (const eId of eAP) {
+        const entity = getEntity(eId);
+        if (!entity) return;
+        entities.push(entity);
+      }
 
-    const { char, tint } = entity.components.appearance!;
-    const { x, y } = entity.components.position!;
+      const sortedEntities = sortBy(entities, "components.layer");
 
-    mapView?.updateCell({
-      0: { char, tint: 0x000001, alpha: 1, tileSet: "tile", x, y },
-      1: { char, tint, alpha: 0.35, tileSet: "ascii", x, y },
-    });
+      // only render top item on stack
+      const entity = sortedEntities[sortedEntities.length - 1];
+
+      const { char, tint } = entity.components.appearance!;
+      const { x, y } = entity.components.position!;
+      // if entity has been revealed - render accordingly
+      if (entity.components.isRevealed) {
+        mapView?.updateCell({
+          0: { char, tint: 0x000001, alpha: 0, tileSet: "tile", x, y },
+          1: { char, tint, alpha: 0.35, tileSet: "ascii", x, y },
+        });
+      }
+
+      // if entity is in fov - render accordingly
+      if (entity.components.isInFov) {
+        mapView?.updateCell({
+          0: { char, tint: 0x111111, alpha: 0, tileSet: "tile", x, y },
+          1: { char, tint, alpha: 1, tileSet: "ascii", x, y },
+        });
+      }
+    }
   }
 
-  // don't do it like this. 
-  // iterate over position in FOV
-  // then work through the EIds at each position
-  // eventually only go through the positions that have actually changed instead of all of them as we are now.
-  for (const eId of inFovQuery.entities) {
-    const entity = getEntity(eId);
-    if (!entity) return;
-
-    const { char, tint } = entity.components.appearance!;
-    const { x, y } = entity.components.position!;
-
-    mapView?.updateCell({
-      0: { char, tint: 0x111111, alpha: 1, tileSet: "tile", x, y },
-      1: { char, tint, alpha: 1, tileSet: "ascii", x, y },
-    });
-  }
-
-  for (const eId of isPlayerQuery.entities) {
-    const entity = getEntity(eId);
-    if (!entity) return;
-
-    const { char, tint } = entity.components.appearance!;
-    const { x, y } = entity.components.position!;
-
-    mapView?.updateCell({
-      1: { char, tint, alpha: 1, tileSet: "ascii", x, y },
-    });
-
-    // this is throwaway until I get the map thing done
-    // reset last location to original
-    getState().toRender.forEach((posId) => {
-      const pos = toPos(posId);
-      mapView?.updateCell({
-        1: {
-          char: "",
-          tint: 0x000000,
-          alpha: 0,
-          tileSet: "ascii",
-          x: pos.x,
-          y: pos.y,
-        },
-      });
-    });
-
-    // // for debugging
-    // const hasAppearance = getQuery(QueryTypes.HasAppearance);
-    // for (const eId of hasAppearance.entities) {
-    //   const entity = getEntity(eId);
-    //   if (!entity) return;
-    //
-    //   const { char, tint } = entity.components.appearance!;
-    //   const { x, y } = entity.components.position!;
-    //
-    //   mapView?.updateCell({
-    //     0: { char, tint, alpha: 1, tileSet: "ascii", x, y },
-    //   });
-    // }
-    // end debug section
-
-    setState((state: State) => (state.toRender = new Set()));
-  }
+  setState((state: State) => (state.toRender = new Set()));
 
   {
     // render log
@@ -164,7 +125,6 @@ export const renderSystem = () => {
   // render inventory
   {
     if (getState().gameState === GameState.INVENTORY) {
-
       // actually render the inventory
       // get player entity
       const [playerEId] = isPlayerQuery.entities;

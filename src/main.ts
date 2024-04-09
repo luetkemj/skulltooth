@@ -128,6 +128,8 @@ export const addEAP = (entity: Entity): State => {
       state.eAP[posId] = new Set();
       state.eAP[posId].add(entity.id);
     }
+
+    state.toRender.add(posId)
   }
 
   return state;
@@ -139,6 +141,7 @@ export const removeEAP = (entity: Entity): State => {
     if (state.eAP[posId]) {
       state.eAP[posId].delete(entity.id);
     }
+    state.toRender.add(posId)
   }
 
   return state;
