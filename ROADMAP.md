@@ -19,7 +19,8 @@ This is aspirational only. Expect anything and everything in this document to be
   - [x] Inventory
   - [x] Inventory UI
   - [x] Pickup/Drop controls
-  - [ ] Healing potion
+  - [x] Healing potion
+    - [x] Effects system
   - [ ] ~~Containers~~
   - [ ] ~~AI for actors to use own inventory~~
 - [ ] Ranged Weapons and Targeting
