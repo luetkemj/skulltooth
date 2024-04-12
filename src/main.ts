@@ -1,4 +1,4 @@
-import { mean } from "lodash";
+import { mean, sample } from "lodash";
 import { pxToPosId, setupCanvas, View } from "./lib/canvas";
 import "./style.css";
 import { aiSystem } from "./systems/ai.system";
@@ -16,12 +16,19 @@ import {
   getEngine,
   getEntity,
 } from "./engine";
-import { createOwlbear, createPlayer } from "./actors";
+import {
+  createHealthPotion,
+  createPoison,
+  createOwlbear,
+  createPlayer,
+} from "./actors";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
 import { toPosId } from "./lib/grid";
+import { addItem } from "./lib/inventory";
 
 import { aStar } from "./lib/pathfinding";
+import { effectsSystem } from "./systems/effects.system";
 
 const enum Turn {
   PLAYER = "PLAYER",
@@ -31,6 +38,7 @@ const enum Turn {
 export const enum GameState {
   GAME = "GAME",
   GAME_OVER = "GAME_OVER",
+  INVENTORY = "INVENTORY",
 }
 
 type EAP = { [key: string]: EIds };
@@ -47,6 +55,8 @@ export type State = {
     log?: View;
     senses?: View;
     legend?: View;
+    inventory?: View;
+    overlay?: View;
   };
   wId: WId;
   playerEId: EId;
@@ -69,6 +79,7 @@ declare global {
     skulltooth: {
       state: State;
       getEngine: Function;
+      getEntity: Function;
       debug: Boolean;
     };
   }
@@ -76,6 +87,7 @@ declare global {
 window.skulltooth = window.skulltooth || {};
 window.skulltooth.getEngine = () => getEngine();
 window.skulltooth.debug = false;
+window.skulltooth.getEntity = (eId: string) => getEntity(eId);
 
 const state: State = {
   eAP: {},
@@ -122,6 +134,8 @@ export const addEAP = (entity: Entity): State => {
       state.eAP[posId] = new Set();
       state.eAP[posId].add(entity.id);
     }
+
+    state.toRender.add(posId);
   }
 
   return state;
@@ -133,13 +147,10 @@ export const removeEAP = (entity: Entity): State => {
     if (state.eAP[posId]) {
       state.eAP[posId].delete(entity.id);
     }
+    state.toRender.add(posId);
   }
 
   return state;
-};
-
-export const addLog = (message: string) => {
-  state.log.push(message);
 };
 
 const init = async () => {
@@ -160,9 +171,17 @@ const init = async () => {
     state.playerEId = player.id;
   });
 
+  const item = createPoison(getState().wId);
+  addItem(item.id, player.id);
+
   dungeon!.rooms.forEach((room, index) => {
     if (index) {
-      createOwlbear(getState().wId, room.center);
+      const creators = [createHealthPotion, createHealthPotion, createOwlbear]
+      const creator = sample(creators)
+
+      if (!creator) return;
+
+      creator(getState().wId, room.center)
     }
   });
 
@@ -175,6 +194,7 @@ const init = async () => {
     tileSets: ["tile", "text"],
     tints: [0xffffff, 0xff0077],
     alphas: [1, 1],
+    visible: true,
   }).updateRows([
     [{}, { string: " skulltooth" }],
     [{ tint: 0xff0077 }, { string: "forcecrusher", tint: 0xffffff }],
@@ -189,6 +209,7 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xff0077],
     alphas: [1],
+    visible: true,
   });
 
   const logView = new View({
@@ -200,6 +221,7 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xeeeeee],
     alphas: [1],
+    visible: true,
   });
 
   const sensesView = new View({
@@ -211,6 +233,7 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xff0077],
     alphas: [1],
+    visible: true,
   });
 
   // 3 render layers
@@ -226,6 +249,7 @@ const init = async () => {
     tileSets: ["tile", "ascii", "tile"],
     tints: [0x000000, 0x000000, 0x000000],
     alphas: [1, 1, 0],
+    visible: true,
   });
 
   const fpsView = new View({
@@ -237,6 +261,7 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xdddddd],
     alphas: [1],
+    visible: true,
   }).updateRows([[{ string: "FPS: calc..." }]]);
 
   new View({
@@ -248,6 +273,7 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xffffff],
     alphas: [1],
+    visible: true,
   }).updateRows([[{ string: "TAG: GITHASH" }]]);
 
   // keyboard controls
@@ -260,7 +286,35 @@ const init = async () => {
     tileSets: ["text"],
     tints: [0xeeeeee],
     alphas: [1],
-  }).updateRows([[], [{ string: "(arrows / hjkl) Move" }]]);
+    visible: true,
+  }).updateRows([[], [{ string: "(arrows / hjkl) Move (i) Inventory" }]]);
+
+  // MENUS
+  // menu overlay (goes over game view, below menu views)
+  const overlayView = new View({
+    width: 100,
+    height: 46,
+    x: 0,
+    y: 0,
+    layers: 1,
+    tileSets: ["tile"],
+    tints: [0x111111],
+    alphas: [0.75],
+    visible: false,
+  });
+
+  // Inventory Menu
+  const inventoryView = new View({
+    width: 148,
+    height: 39,
+    x: 26,
+    y: 5,
+    layers: 2,
+    tileSets: ["tile", "text"],
+    tints: [0x111111, 0xffffff],
+    alphas: [1],
+    visible: false,
+  });
 
   setState((state: State) => {
     state.views.fps = fpsView;
@@ -268,6 +322,8 @@ const init = async () => {
     state.views.log = logView;
     state.views.senses = sensesView;
     state.views.legend = legendView;
+    state.views.inventory = inventoryView;
+    state.views.overlay = overlayView;
   });
 
   const start = dungeon!.rooms[0].center;
@@ -314,10 +370,21 @@ let fpsSamples: Array<Number> = [];
 function gameLoop() {
   requestAnimationFrame(gameLoop);
 
+  if (getState().gameState === GameState.INVENTORY) {
+    if (getState().userInput && getState().turn === Turn.PLAYER) {
+      userInputSystem();
+      effectsSystem();
+      fovSystem();
+      legendSystem();
+      renderSystem();
+    }
+  }
+
   if (getState().gameState === GameState.GAME) {
     // systems
     if (getState().userInput && getState().turn === Turn.PLAYER) {
       userInputSystem();
+      effectsSystem();
       movementSystem();
       fovSystem();
       legendSystem();
@@ -330,6 +397,7 @@ function gameLoop() {
 
     if (getState().turn === Turn.WORLD) {
       aiSystem();
+      effectsSystem();
       movementSystem();
       fovSystem();
       legendSystem();

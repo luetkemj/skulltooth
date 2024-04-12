@@ -13,10 +13,14 @@ export const legendSystem = () => {
   if (!playerEntity) return;
 
   // build an array of legendable entities.
-  const entities: Array<Entity> = [];
+  const entities: Array<Entity> = [playerEntity];
 
   isLegendableQuery.entities.forEach((eId) => {
     const entity = getEntity(eId);
+
+    if (!entity) return
+
+    if (entity.id === playerEntity.id) return
 
     if (entity) {
       entities.push(entity);

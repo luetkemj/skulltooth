@@ -1,15 +1,29 @@
 import { cloneDeep, every, some } from "lodash";
 
+type Effect = {
+  name: string;
+  component: ComponentTypes.Health;
+  delta: number;
+  duration: number;
+  id: string;
+};
+
 type AppearanceComponent = {
   char: string;
   tint: number;
   tileSet: string;
 };
 
+export type EffectsComponent = Array<Effect>;
+
+type ActiveEffectsComponent = Array<Effect>;
+
 type HealthComponent = {
   max: number;
   current: number;
 };
+
+type InventoryComponent = EIds;
 
 type PositionComponent = {
   x: number;
@@ -24,39 +38,43 @@ type TryMoveComponent = {
 };
 
 export enum ComponentTypes {
+  ActiveEffects = 'activeEffects',
   Ai = "ai",
   Appearance = "appearance",
-  Health = 'health',
+  EffectsComponent = 'effects',
+  Health = "health",
+  Inventory = "inventory",
   IsBlocking = "isBlocking",
   IsInFov = "isInFov",
   IsOpaque = "isOpaque",
   IsPlayer = "isPlayer",
   IsRevealed = "isRevealed",
-  Layer100 = "layer100",
-  Layer200 = "layer200",
-  Layer300 = "layer300",
-  Legendable = 'legendable',
+  Layer = "layer",
+  Legendable = "legendable",
   Name = "name",
   PathThrough = "pathThrough",
+  Pickup = "pickup",
   Position = "position",
   TryMove = "tryMove",
 }
 
 export type Components = {
-  ai?: {},
+  activeEffects?: ActiveEffectsComponent;
+  ai?: {};
   appearance?: AppearanceComponent;
+  effects?: EffectsComponent;
   health?: HealthComponent;
+  inventory?: InventoryComponent;
   isBlocking?: {};
   isInFov?: {};
   isOpaque?: {};
   isPlayer?: {};
   isRevealed?: {};
-  layer100?: {}; // ground layer
-  layer200?: {}; // item layer
-  layer300?: {}; // actor layer
+  layer?: Number;
   legendable?: {};
   name?: String;
   pathThrough?: {};
+  pickup?: {};
   position?: PositionComponent;
   tryMove?: TryMoveComponent;
 };

@@ -7,19 +7,19 @@ export const renderable: Components = {
     tileSet: "ascii",
   },
   position: { x: 0, y: 0, z: 0 },
-  name: 'unnamed',
+  name: "unnamed",
 };
 
 export const tile: Components = {
-  layer100: {},
-  name: 'unnamed',
+  layer: 100,
+  name: "unnamed",
 };
 
 export const blockingTile: Components = {
   isBlocking: {},
   isOpaque: {},
-  layer100: {},
-  name: 'unnamed',
+  layer: 101,
+  name: "unnamed",
 };
 
 export const being: Components = {
@@ -28,9 +28,16 @@ export const being: Components = {
     current: 10,
   },
   isBlocking: {},
-  layer200: {},
-  name: 'unnamed',
+  layer: 201,
+  name: "unnamed",
   legendable: {},
+  activeEffects: [],
+};
+
+export const item: Components = {
+  layer: 200,
+  legendable: {},
+  pickup: {},
 };
 
 export const mob: Components = {

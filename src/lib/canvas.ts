@@ -80,6 +80,7 @@ interface ViewOptions {
   tileSets: Array<string>;
   tints: Array<number>;
   alphas: Array<number>;
+  visible: boolean;
 }
 
 interface GetTextureOptions {
@@ -141,6 +142,7 @@ export class View {
   tileSets: Array<string> = [];
   tints: Array<number> = [];
   alphas: Array<number> = [];
+  visible: boolean = true;
 
   constructor(options: ViewOptions) {
     this.width = options.width;
@@ -149,6 +151,7 @@ export class View {
     this.tints = options.tints;
     this.alphas = options.alphas;
     this.halfWidth = this.tileSets.includes("text");
+    this.visible = options.visible;
 
     // create n layers of containers
     _.times(options.layers, () => this.layers.push(new Container()));
@@ -162,6 +165,7 @@ export class View {
       layer.x = posX;
       layer.y = posY;
       layer.interactiveChildren = false;
+      layer.visible = this.visible;
 
       app.stage.addChild(layer);
     });
@@ -315,5 +319,15 @@ export class View {
 
       layerIndex += 1;
     });
+  };
+
+  show = () => {
+    this.visible = true;
+    this.layers.forEach((layer) => (layer.visible = this.visible));
+  };
+
+  hide = () => {
+    this.visible = false;
+    this.layers.forEach((layer) => (layer.visible = this.visible));
   };
 }
