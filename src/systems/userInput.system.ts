@@ -4,7 +4,6 @@ import { addItem, dropItem } from "../lib/inventory";
 import { GameState, getState, setState, State } from "../main";
 import { QueryTypes } from "../queries";
 import { addLog, addEffectsToEntity } from "../lib/utils";
-import { item } from "../actors/prefabs";
 
 const moveKeys = [
   "ArrowLeft",

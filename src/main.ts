@@ -17,7 +17,6 @@ import {
   getEntity,
 } from "./engine";
 import {
-  createItem,
   createHealthPotion,
   createPoison,
   createOwlbear,

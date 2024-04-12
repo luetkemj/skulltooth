@@ -132,8 +132,9 @@ export const renderSystem = () => {
       if (!playerEntity) return;
 
       const rows: Array<Array<UpdateRow>> = [];
-      const itemsInInventory = [...playerEntity.components.inventory].map(
-        (eId) => getEntity(eId)
+      const playerInventory = playerEntity.components.inventory || [];
+      const itemsInInventory = [...playerInventory].map((eId) =>
+        getEntity(eId)
       );
 
       itemsInInventory.forEach((item) => {

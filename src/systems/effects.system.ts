@@ -1,4 +1,4 @@
-import { type Entity, addComponent, getEntity, getQuery } from "../engine";
+import { getEntity, getQuery } from "../engine";
 import { QueryTypes } from "../queries";
 
 export const effectsSystem = () => {
