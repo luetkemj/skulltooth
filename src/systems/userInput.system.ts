@@ -1,9 +1,10 @@
-import { addComponent, getEntity, getQuery } from "../engine";
+import { addComponent, destroyEntity, getEntity, getQuery } from "../engine";
 import { toPosId } from "../lib/grid";
 import { addItem, dropItem } from "../lib/inventory";
 import { GameState, getState, setState, State } from "../main";
 import { QueryTypes } from "../queries";
-import { addLog } from "../lib/utils";
+import { addLog, addEffectsToEntity } from "../lib/utils";
+import { item } from "../actors/prefabs";
 
 const moveKeys = [
   "ArrowLeft",
@@ -77,7 +78,7 @@ export const userInputSystem = () => {
         }
       });
       if (noPickupsFound) {
-        addLog('There is nothing to pickup')
+        addLog("There is nothing to pickup");
       }
     }
   }
@@ -86,24 +87,34 @@ export const userInputSystem = () => {
     if (key === "i" || key === "Escape") {
       setState((state: State) => (state.gameState = GameState.GAME));
     }
+    if (key === "c") {
+      if (!playerEntity.components.inventory) return;
+      // get first item in inventory
+      const [itemEId] = playerEntity.components.inventory;
+      const itemEntity = getEntity(itemEId);
+      if (!itemEntity) return;
+      if (!itemEntity.components.effects) return;
+
+      // Use consumable
+      addEffectsToEntity(itemEntity.components.effects, playerEntity);
+      // remove item from inventory
+      playerEntity.components.inventory.delete(itemEId)
+      addLog(`You consume the ${itemEntity.components.name}.`)
+      // destroy the entity
+      destroyEntity(itemEntity.id);
+    }
 
     if (key === "d") {
-      // drop first item in inventory
       if (!playerEntity.components.inventory) return;
-      // if (!playerEntity.components.position) return;
-      //
+
+      // get first item in inventory
       const [itemEId] = playerEntity.components.inventory;
-      const itemEntity = getEntity(itemEId)
-      //
-      if (!itemEntity) return
-      // // add position to item
-      // addPosition(itemEntity.id, playerEntity.components.position)
-      // // remove item from inventory
-      // playerEntity.components.inventory.delete(itemEId)
-      // // send log
+      const itemEntity = getEntity(itemEId);
+      if (!itemEntity) return;
+
+      // drop item
       dropItem(itemEId, playerEntity.id);
-      addLog(`You drop a ${itemEntity.components.name}`)
-      // if no items in inventory do nothing.
+      addLog(`You drop a ${itemEntity.components.name}`);
     }
   }
 

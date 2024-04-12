@@ -16,6 +16,7 @@ import {
   mob,
   item,
 } from "../actors/prefabs";
+import { addPosition, removePosition } from "../lib/utils";
 
 export const createFloor = (wId: WId, position?: Pos) => {
   const entity = createEntity({ wId });
@@ -65,7 +66,7 @@ export const createPlayer = (wId: WId, position?: Pos) => {
     inventory: new Set(),
     health: {
       max: 100,
-      current: 100,
+      current: 98,
     },
   });
 
@@ -118,6 +119,70 @@ export const createItem = (wId: WId, position?: Pos) => {
     addEAP(entity);
   } else {
     removeComponent(entity.id, ComponentTypes.Position);
+  }
+
+  return entity;
+};
+
+export const createHealthPotion = (wId: WId, position?: Pos) => {
+  const entity = createEntity({ wId });
+
+  addPrefabs(entity.id, [renderable, item]);
+
+  addComponent(entity.id, {
+    appearance: {
+      char: "!",
+      tint: 0xff0088,
+      tileSet: "ascii",
+    },
+    name: "health potion",
+    effects: [
+      {
+        name: "heal",
+        component: ComponentTypes.Health,
+        delta: 3,
+        duration: 1,
+        id: "123",
+      },
+    ],
+  });
+
+  if (position) {
+    addPosition(entity.id, position);
+  } else {
+    removePosition(entity.id);
+  }
+
+  return entity;
+};
+
+export const createPoison = (wId: WId, position?: Pos) => {
+  const entity = createEntity({ wId });
+
+  addPrefabs(entity.id, [renderable, item]);
+
+  addComponent(entity.id, {
+    appearance: {
+      char: "!",
+      tint: 0xff0088,
+      tileSet: "ascii",
+    },
+    name: "poison",
+    effects: [
+      {
+        name: "harm",
+        component: ComponentTypes.Health,
+        delta: -3,
+        duration: 1,
+        id: "123",
+      },
+    ],
+  });
+
+  if (position) {
+    addPosition(entity.id, position);
+  } else {
+    removePosition(entity.id);
   }
 
   return entity;

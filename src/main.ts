@@ -1,4 +1,4 @@
-import { mean } from "lodash";
+import { mean, sample } from "lodash";
 import { pxToPosId, setupCanvas, View } from "./lib/canvas";
 import "./style.css";
 import { aiSystem } from "./systems/ai.system";
@@ -16,13 +16,20 @@ import {
   getEngine,
   getEntity,
 } from "./engine";
-import { createItem, createOwlbear, createPlayer } from "./actors";
+import {
+  createItem,
+  createHealthPotion,
+  createPoison,
+  createOwlbear,
+  createPlayer,
+} from "./actors";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
 import { toPosId } from "./lib/grid";
 import { addItem } from "./lib/inventory";
 
 import { aStar } from "./lib/pathfinding";
+import { effectsSystem } from "./systems/effects.system";
 
 const enum Turn {
   PLAYER = "PLAYER",
@@ -129,7 +136,7 @@ export const addEAP = (entity: Entity): State => {
       state.eAP[posId].add(entity.id);
     }
 
-    state.toRender.add(posId)
+    state.toRender.add(posId);
   }
 
   return state;
@@ -141,7 +148,7 @@ export const removeEAP = (entity: Entity): State => {
     if (state.eAP[posId]) {
       state.eAP[posId].delete(entity.id);
     }
-    state.toRender.add(posId)
+    state.toRender.add(posId);
   }
 
   return state;
@@ -165,13 +172,17 @@ const init = async () => {
     state.playerEId = player.id;
   });
 
-  const item = createItem(getState().wId);
+  const item = createPoison(getState().wId);
   addItem(item.id, player.id);
 
   dungeon!.rooms.forEach((room, index) => {
     if (index) {
-      // createOwlbear(getState().wId, room.center);
-      createItem(getState().wId, room.center);
+      const creators = [createHealthPotion, createHealthPotion, createOwlbear]
+      const creator = sample(creators)
+
+      if (!creator) return;
+
+      creator(getState().wId, room.center)
     }
   });
 
@@ -363,6 +374,7 @@ function gameLoop() {
   if (getState().gameState === GameState.INVENTORY) {
     if (getState().userInput && getState().turn === Turn.PLAYER) {
       userInputSystem();
+      effectsSystem();
       fovSystem();
       legendSystem();
       renderSystem();
@@ -373,6 +385,7 @@ function gameLoop() {
     // systems
     if (getState().userInput && getState().turn === Turn.PLAYER) {
       userInputSystem();
+      effectsSystem();
       movementSystem();
       fovSystem();
       legendSystem();
@@ -385,6 +398,7 @@ function gameLoop() {
 
     if (getState().turn === Turn.WORLD) {
       aiSystem();
+      effectsSystem();
       movementSystem();
       fovSystem();
       legendSystem();

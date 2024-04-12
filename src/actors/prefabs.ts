@@ -31,6 +31,7 @@ export const being: Components = {
   layer: 201,
   name: "unnamed",
   legendable: {},
+  activeEffects: [],
 };
 
 export const item: Components = {

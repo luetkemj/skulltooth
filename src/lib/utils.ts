@@ -3,6 +3,8 @@ import {
   ComponentTypes,
   getEntity,
   removeComponent,
+  EffectsComponent,
+  Entity,
 } from "../engine";
 import { setState, State, removeEAP, addEAP } from "../main";
 import { Pos } from "./grid";
@@ -40,4 +42,14 @@ export const removePosition = (eId: string) => {
 
 export const addLog = (message: string) => {
   setState((state: State) => state.log.push(message));
+};
+
+export const addEffectsToEntity = (
+  effects: EffectsComponent,
+  entity: Entity
+) => {
+  // check if entity has activeEffects component
+  if (!entity.components.activeEffects) return
+
+  entity.components.activeEffects.push(...effects)
 };

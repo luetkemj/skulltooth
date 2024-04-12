@@ -1,10 +1,22 @@
 import { cloneDeep, every, some } from "lodash";
 
+type Effect = {
+  name: string;
+  component: ComponentTypes.Health;
+  delta: number;
+  duration: number;
+  id: string;
+};
+
 type AppearanceComponent = {
   char: string;
   tint: number;
   tileSet: string;
 };
+
+export type EffectsComponent = Array<Effect>;
+
+type ActiveEffectsComponent = Array<Effect>;
 
 type HealthComponent = {
   max: number;
@@ -26,8 +38,10 @@ type TryMoveComponent = {
 };
 
 export enum ComponentTypes {
+  ActiveEffects = 'activeEffects',
   Ai = "ai",
   Appearance = "appearance",
+  EffectsComponent = 'effects',
   Health = "health",
   Inventory = "inventory",
   IsBlocking = "isBlocking",
@@ -45,8 +59,10 @@ export enum ComponentTypes {
 }
 
 export type Components = {
+  activeEffects?: ActiveEffectsComponent;
   ai?: {};
   appearance?: AppearanceComponent;
+  effects?: EffectsComponent;
   health?: HealthComponent;
   inventory?: InventoryComponent;
   isBlocking?: {};

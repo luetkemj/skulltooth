@@ -30,6 +30,7 @@ export const dropItem = (itemEId: string, containerEId: string) => {
   // remove item from inventory
   containerEntity.components.inventory.delete(itemEId);
   // add position to item
+  // deep clone?
   addPosition(itemEId, { ...containerEntity.components.position });
   addComponent(itemEId, { legendable: {} });
 };
