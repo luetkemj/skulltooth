@@ -2,6 +2,7 @@ import { mean, sample } from "lodash";
 import { pxToPosId, setupCanvas, View } from "./lib/canvas";
 import "./style.css";
 import { aiSystem } from "./systems/ai.system";
+import { effectsSystem } from "./systems/effects.system";
 import { fovSystem } from "./systems/fov.system";
 import { legendSystem } from "./systems/legend.system";
 import { movementSystem } from "./systems/movement.system";
@@ -25,10 +26,8 @@ import {
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
 import { toPosId } from "./lib/grid";
-import { addItem } from "./lib/inventory";
 
 import { aStar } from "./lib/pathfinding";
-import { effectsSystem } from "./systems/effects.system";
 
 const enum Turn {
   PLAYER = "PLAYER",
