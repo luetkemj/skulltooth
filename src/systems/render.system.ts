@@ -38,6 +38,7 @@ export const renderSystem = () => {
     legend: legendView,
     inventory: inventoryView,
     overlay: overlayView,
+    controls: controlsView,
   } = getState().views;
 
   for (const posId of getState().toRender) {
@@ -155,5 +156,19 @@ export const renderSystem = () => {
       overlayView?.hide();
       inventoryView?.hide();
     }
+  }
+
+  // render controls
+  {
+    let controls = "(arrows/hjkl)Move (i)Inventory";
+
+    if (getState().gameState === GameState.INVENTORY) {
+      controls = "(i/escape)Return to Game (d)Drop (c)Consume";
+    }
+
+    // GameState GAME has default controls scheme set at the start.
+    // So we don't have to reset it down here.
+
+    controlsView?.updateRows([[], [{ string: controls }]]);
   }
 };

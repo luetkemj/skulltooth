@@ -57,6 +57,7 @@ export type State = {
     legend?: View;
     inventory?: View;
     overlay?: View;
+    controls?: View;
   };
   wId: WId;
   playerEId: EId;
@@ -171,12 +172,9 @@ const init = async () => {
     state.playerEId = player.id;
   });
 
-  const item = createPoison(getState().wId);
-  addItem(item.id, player.id);
-
   dungeon!.rooms.forEach((room, index) => {
     if (index) {
-      const creators = [createHealthPotion, createHealthPotion, createOwlbear]
+      const creators = [createHealthPotion, createPoison, createOwlbear, createOwlbear]
       const creator = sample(creators)
 
       if (!creator) return;
@@ -277,7 +275,7 @@ const init = async () => {
   }).updateRows([[{ string: "TAG: GITHASH" }]]);
 
   // keyboard controls
-  new View({
+  const controlsView = new View({
     width: 148,
     height: 2,
     x: 26,
@@ -287,13 +285,13 @@ const init = async () => {
     tints: [0xeeeeee],
     alphas: [1],
     visible: true,
-  }).updateRows([[], [{ string: "(arrows / hjkl) Move (i) Inventory" }]]);
+  });
 
   // MENUS
   // menu overlay (goes over game view, below menu views)
   const overlayView = new View({
     width: 100,
-    height: 46,
+    height: 44,
     x: 0,
     y: 0,
     layers: 1,
@@ -310,7 +308,7 @@ const init = async () => {
     x: 26,
     y: 5,
     layers: 2,
-    tileSets: ["tile", "text"],
+    tileSets: ["text", "text"],
     tints: [0x111111, 0xffffff],
     alphas: [1],
     visible: false,
@@ -324,6 +322,7 @@ const init = async () => {
     state.views.legend = legendView;
     state.views.inventory = inventoryView;
     state.views.overlay = overlayView;
+    state.views.controls = controlsView;
   });
 
   const start = dungeon!.rooms[0].center;
