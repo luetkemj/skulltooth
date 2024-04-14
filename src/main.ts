@@ -31,7 +31,7 @@ import { type Pos, toPosId } from "./lib/grid";
 
 import { aStar } from "./lib/pathfinding";
 
-const enum Turn {
+export const enum Turn {
   PLAYER = "PLAYER",
   WORLD = "WORLD",
 }
@@ -41,6 +41,7 @@ export const enum GameState {
   GAME_OVER = "GAME_OVER",
   INVENTORY = "INVENTORY",
   INSPECT = "INSPECT",
+  TARGET = "TARGET",
 }
 
 type EAP = { [key: string]: EIds };
@@ -383,7 +384,8 @@ let fpsSamples: Array<Number> = [];
 function gameLoop() {
   requestAnimationFrame(gameLoop);
 
-  if (getState().gameState === GameState.INSPECT) {
+
+  if (getState().gameState === GameState.INSPECT || getState().gameState === GameState.TARGET) {
     if (getState().userInput && getState().turn === Turn.PLAYER) {
       userInputSystem();
       fovSystem();
@@ -413,9 +415,11 @@ function gameLoop() {
       legendSystem();
       renderSystem();
 
-      setState((state: State) => {
-        state.turn = Turn.WORLD;
-      });
+      if (getState().gameState === GameState.GAME) {
+        setState((state: State) => {
+          state.turn = Turn.WORLD;
+        });
+      }
     }
 
     if (getState().turn === Turn.WORLD) {

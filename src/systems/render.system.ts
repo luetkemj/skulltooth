@@ -169,18 +169,20 @@ export const renderSystem = () => {
       x: pos0.x,
       y: pos0.y,
     };
-    if (getState().gameState === GameState.INSPECT) {
+    if (
+      getState().gameState === GameState.INSPECT ||
+      getState().gameState === GameState.TARGET
+    ) {
       // clear last cursor
       mapView?.updateCell({
         2: { ...cursorProps, alpha: 0, x: pos0.x, y: pos0.y },
       });
       // draw new cursor
       mapView?.updateCell({
-        2: { ...cursorProps, alpha: 1, x: pos1.x, y: pos1.y },
+        2: { ...cursorProps, alpha: 0.25, x: pos1.x, y: pos1.y },
       });
     } else {
-      console.log('yo')
-      // hide map overlay
+      // hide cursor
       mapView?.updateCell({
         2: { ...cursorProps, alpha: 0, x: pos1.x, y: pos1.y },
       });

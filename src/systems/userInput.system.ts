@@ -1,7 +1,7 @@
 import { addComponent, destroyEntity, getEntity, getQuery } from "../engine";
 import { toPosId } from "../lib/grid";
-import { addItem, dropItem } from "../lib/inventory";
-import { GameState, getState, setState, State } from "../main";
+import { addItem, dropItem, throwItem } from "../lib/inventory";
+import { GameState, Turn, getState, setState, State } from "../main";
 import { QueryTypes } from "../queries";
 import { addLog, addEffectsToEntity, outOfBounds } from "../lib/utils";
 
@@ -86,10 +86,18 @@ export const userInputSystem = () => {
     }
   }
 
-  if (gameState === GameState.INSPECT) {
-    if (key === "L" || key === "Escape") {
-      setState((state: State) => (state.gameState = GameState.GAME));
+  if (gameState === GameState.INSPECT || gameState === GameState.TARGET) {
+    if (gameState === GameState.INSPECT) {
+      if (key === "L" || key === "Escape") {
+        setState((state: State) => (state.gameState = GameState.GAME));
+      }
     }
+    if (gameState === GameState.TARGET) {
+      if (key === "Escape") {
+        setState((state: State) => (state.gameState = GameState.INVENTORY));
+      }
+    }
+
     if (moveKeys.includes(key)) {
       if (playerEntity?.components.position) {
         const oldPos = getState().cursor[1];
@@ -131,6 +139,8 @@ export const userInputSystem = () => {
     if (key === "i" || key === "Escape") {
       setState((state: State) => (state.gameState = GameState.GAME));
     }
+
+    // consume item
     if (key === "c") {
       if (!playerEntity.components.inventory) return;
       // get first item in inventory
@@ -148,6 +158,7 @@ export const userInputSystem = () => {
       destroyEntity(itemEntity.id);
     }
 
+    // drop item
     if (key === "d") {
       if (!playerEntity.components.inventory) return;
 
@@ -159,6 +170,42 @@ export const userInputSystem = () => {
       // drop item
       dropItem(itemEId, playerEntity.id);
       addLog(`You drop a ${itemEntity.components.name}`);
+    }
+
+    // throw item
+    if (key === "t") {
+      if (!playerEntity.components.inventory) return;
+
+      // get first item in inventory
+      const [itemEId] = playerEntity.components.inventory;
+      const itemEntity = getEntity(itemEId);
+      if (!itemEntity) return;
+
+      // throw item
+      // enter target mode
+      setState((state: State) => (state.gameState = GameState.TARGET));
+      // throwItem (drop) at specific location
+      // how to damage enemies?
+      // dropItem(itemEId, playerEntity.id);
+      // addLog(`You threw a ${itemEntity.components.name}`);
+    }
+  }
+
+  if (gameState === GameState.TARGET) {
+    if (key === "Enter") {
+      // get first item in inventory
+      if (!playerEntity.components.inventory) return;
+      const [itemEId] = playerEntity.components.inventory;
+      const itemEntity = getEntity(itemEId);
+      if (!itemEntity) return;
+
+      throwItem(itemEId, playerEntity.id, getState().cursor[1]);
+      addLog(`You threw a ${itemEntity.components.name}`);
+
+      setState((state: State) => {
+        state.gameState = GameState.GAME;
+        state.turn = Turn.WORLD;
+      });
     }
   }
 

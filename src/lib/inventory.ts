@@ -1,10 +1,11 @@
 import {
   getEntity,
   removeComponent,
-  ComponentTypes,
   addComponent,
+  ComponentTypes,
 } from "../engine";
-import { addPosition, removePosition } from "./utils";
+import { Pos } from "./grid";
+import { addPosition, removePosition, updatePosition } from "./utils";
 
 export const addItem = (itemEId: string, containerEId: string) => {
   const containerEntity = getEntity(containerEId);
@@ -33,4 +34,13 @@ export const dropItem = (itemEId: string, containerEId: string) => {
   // deep clone?
   addPosition(itemEId, { ...containerEntity.components.position });
   addComponent(itemEId, { legendable: {} });
+};
+
+export const throwItem = (
+  itemEId: string,
+  containerEId: string,
+  targetPos: Pos
+) => {
+  dropItem(itemEId, containerEId);
+  updatePosition(itemEId, targetPos);
 };

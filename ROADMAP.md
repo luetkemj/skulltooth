@@ -23,9 +23,9 @@ This is aspirational only. Expect anything and everything in this document to be
     - [x] Effects system
 - [ ] Ranged Weapons and Targeting
   - [x] Cursor (inspect ui)
-  - [ ] Targeting UI (for throwing)
-  - [ ] Ability to throw things to a specified location
-  - [ ] Ability to shoot things from a ranged weapon
+  - [x] Targeting UI (for throwing)
+  - [x] Ability to throw things to a specified location
+  - [ ] Thrown item cause damage
 - [ ] Saving and loading
 - [ ] Delving into the Dungeon
 - [ ] Increasing Difficulty
@@ -36,5 +36,6 @@ This is aspirational only. Expect anything and everything in this document to be
 - [ ] Sensory System
 - [ ] Overworld map with multiple dungeons to explore
 - [ ] Crafting
+- [ ] Ability to shoot things from a ranged weapon
 - [ ] color coded logs (ale-dsi/brogue-esque)
   - [ ] support writing mutiple colors to a text row
