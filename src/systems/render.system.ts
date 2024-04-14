@@ -37,7 +37,7 @@ export const renderSystem = () => {
     senses: sensesView,
     legend: legendView,
     inventory: inventoryView,
-    overlay: overlayView,
+    menuUnderlay: menuUnderlayView,
     controls: controlsView,
   } = getState().views;
 
@@ -148,13 +148,42 @@ export const renderSystem = () => {
       });
 
       // console.log(rows);
-      overlayView?.show();
+      menuUnderlayView?.show();
       inventoryView?.clearView();
       inventoryView?.updateRows(rows);
       inventoryView?.show();
     } else {
-      overlayView?.hide();
+      menuUnderlayView?.hide();
       inventoryView?.hide();
+    }
+  }
+
+  // renderCursor for inspection/targeting etc
+  {
+    const [pos0, pos1] = getState().cursor;
+    const cursorProps = {
+      char: "",
+      tint: 0x00ff77,
+      tileSet: "tile",
+      alpha: 0,
+      x: pos0.x,
+      y: pos0.y,
+    };
+    if (getState().gameState === GameState.INSPECT) {
+      // clear last cursor
+      mapView?.updateCell({
+        2: { ...cursorProps, alpha: 0, x: pos0.x, y: pos0.y },
+      });
+      // draw new cursor
+      mapView?.updateCell({
+        2: { ...cursorProps, alpha: 1, x: pos1.x, y: pos1.y },
+      });
+    } else {
+      console.log('yo')
+      // hide map overlay
+      mapView?.updateCell({
+        2: { ...cursorProps, alpha: 0, x: pos1.x, y: pos1.y },
+      });
     }
   }
 

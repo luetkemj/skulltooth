@@ -3,7 +3,6 @@ import {
   ComponentTypes,
   addComponent,
   addPrefabs,
-  removeComponent,
   createEntity,
 } from "../engine";
 import { addEAP } from "../main";
@@ -17,13 +16,15 @@ import {
   item,
 } from "../actors/prefabs";
 import { addPosition, removePosition } from "../lib/utils";
+import { CHARS, COLORS } from "./graphics";
 
 export const createFloor = (wId: WId, position?: Pos) => {
   const entity = createEntity({ wId });
 
   addPrefabs(entity.id, [renderable, tile]);
 
-  entity.components.appearance!.char = "•";
+  entity.components.appearance!.char = CHARS.FLOOR;
+  entity.components.appearance!.tint = COLORS.FLOOR;
   entity.components.name = "floor";
 
   if (position) {
@@ -38,8 +39,8 @@ export const createWall = (wId: WId, position?: Pos) => {
   const entity = createEntity({ wId });
   addPrefabs(entity.id, [renderable, blockingTile]);
 
-  entity.components.appearance!.char = "#";
-  entity.components.appearance!.tint = 0x808080;
+  entity.components.appearance!.char = CHARS.WALL;
+  entity.components.appearance!.tint = COLORS.WALL;
   entity.components.name = "wall";
 
   if (position) {
@@ -57,8 +58,8 @@ export const createPlayer = (wId: WId, position?: Pos) => {
 
   addComponent(entity.id, {
     appearance: {
-      char: "@",
-      tint: 0xff0088,
+      char: CHARS.PLAYER,
+      tint: COLORS.PLAYER,
       tileSet: "ascii",
     },
     isPlayer: {},
@@ -85,8 +86,8 @@ export const createOwlbear = (wId: WId, position?: Pos) => {
 
   addComponent(entity.id, {
     appearance: {
-      char: "F",
-      tint: 0xff0088,
+      char: CHARS.OWLBEAR,
+      tint: COLORS.OWLBEAR,
       tileSet: "ascii",
     },
     name: "owlbear",
@@ -100,30 +101,6 @@ export const createOwlbear = (wId: WId, position?: Pos) => {
   return entity;
 };
 
-export const createItem = (wId: WId, position?: Pos) => {
-  const entity = createEntity({ wId });
-
-  addPrefabs(entity.id, [renderable, item]);
-
-  addComponent(entity.id, {
-    appearance: {
-      char: "?",
-      tint: 0xff0088,
-      tileSet: "ascii",
-    },
-    name: "item",
-  });
-
-  if (position) {
-    addComponent(entity.id, { position });
-    addEAP(entity);
-  } else {
-    removeComponent(entity.id, ComponentTypes.Position);
-  }
-
-  return entity;
-};
-
 export const createHealthPotion = (wId: WId, position?: Pos) => {
   const entity = createEntity({ wId });
 
@@ -131,8 +108,8 @@ export const createHealthPotion = (wId: WId, position?: Pos) => {
 
   addComponent(entity.id, {
     appearance: {
-      char: "!",
-      tint: 0xff0088,
+      char: CHARS.POTION,
+      tint: COLORS.POTION,
       tileSet: "ascii",
     },
     name: "health potion",
@@ -163,8 +140,8 @@ export const createPoison = (wId: WId, position?: Pos) => {
 
   addComponent(entity.id, {
     appearance: {
-      char: "!",
-      tint: 0xff0088,
+      char: CHARS.POTION,
+      tint: COLORS.POTION,
       tileSet: "ascii",
     },
     name: "poison",
@@ -177,6 +154,29 @@ export const createPoison = (wId: WId, position?: Pos) => {
         id: "123",
       },
     ],
+  });
+
+  if (position) {
+    addPosition(entity.id, position);
+  } else {
+    removePosition(entity.id);
+  }
+
+  return entity;
+};
+
+export const createRock = (wId: WId, position?: Pos) => {
+  const entity = createEntity({ wId });
+
+  addPrefabs(entity.id, [renderable, item]);
+
+  addComponent(entity.id, {
+    appearance: {
+      char: CHARS.ROCK,
+      tint: COLORS.ROCK,
+      tileSet: "ascii",
+    },
+    name: "rock",
   });
 
   if (position) {

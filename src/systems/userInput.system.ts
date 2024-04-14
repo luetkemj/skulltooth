@@ -3,7 +3,7 @@ import { toPosId } from "../lib/grid";
 import { addItem, dropItem } from "../lib/inventory";
 import { GameState, getState, setState, State } from "../main";
 import { QueryTypes } from "../queries";
-import { addLog, addEffectsToEntity } from "../lib/utils";
+import { addLog, addEffectsToEntity, outOfBounds } from "../lib/utils";
 
 const moveKeys = [
   "ArrowLeft",
@@ -34,6 +34,10 @@ export const userInputSystem = () => {
   if (gameState === GameState.GAME) {
     if (key === "i") {
       setState((state: State) => (state.gameState = GameState.INVENTORY));
+    }
+
+    if (key === "L") {
+      setState((state: State) => (state.gameState = GameState.INSPECT));
     }
 
     if (moveKeys.includes(key)) {
@@ -82,6 +86,47 @@ export const userInputSystem = () => {
     }
   }
 
+  if (gameState === GameState.INSPECT) {
+    if (key === "L" || key === "Escape") {
+      setState((state: State) => (state.gameState = GameState.GAME));
+    }
+    if (moveKeys.includes(key)) {
+      if (playerEntity?.components.position) {
+        const oldPos = getState().cursor[1];
+        const { x, y, z } = oldPos;
+
+        if (key === "h" || key === "ArrowLeft") {
+          const newPos = { x: x - 1, y, z };
+          if (outOfBounds(newPos)) return;
+          setState((state: State) => {
+            state.cursor = [oldPos, newPos];
+          });
+        }
+        if (key === "j" || key === "ArrowDown") {
+          const newPos = { x, y: y + 1, z };
+          if (outOfBounds(newPos)) return;
+          setState((state: State) => {
+            state.cursor = [oldPos, newPos];
+          });
+        }
+        if (key === "k" || key === "ArrowUp") {
+          const newPos = { x, y: y - 1, z };
+          if (outOfBounds(newPos)) return;
+          setState((state: State) => {
+            state.cursor = [oldPos, newPos];
+          });
+        }
+        if (key === "l" || key === "ArrowRight") {
+          const newPos = { x: x + 1, y, z };
+          if (outOfBounds(newPos)) return;
+          setState((state: State) => {
+            state.cursor = [oldPos, newPos];
+          });
+        }
+      }
+    }
+  }
+
   if (gameState === GameState.INVENTORY) {
     if (key === "i" || key === "Escape") {
       setState((state: State) => (state.gameState = GameState.GAME));
@@ -97,8 +142,8 @@ export const userInputSystem = () => {
       // Use consumable
       addEffectsToEntity(itemEntity.components.effects, playerEntity);
       // remove item from inventory
-      playerEntity.components.inventory.delete(itemEId)
-      addLog(`You consume the ${itemEntity.components.name}.`)
+      playerEntity.components.inventory.delete(itemEId);
+      addLog(`You consume the ${itemEntity.components.name}.`);
       // destroy the entity
       destroyEntity(itemEntity.id);
     }

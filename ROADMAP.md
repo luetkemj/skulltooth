@@ -21,9 +21,9 @@ This is aspirational only. Expect anything and everything in this document to be
   - [x] Pickup/Drop controls
   - [x] Healing potion
     - [x] Effects system
-  - [ ] ~~Containers~~
-  - [ ] ~~AI for actors to use own inventory~~
 - [ ] Ranged Weapons and Targeting
+  - [x] Cursor (inspect ui)
+  - [ ] Targeting UI (for throwing)
   - [ ] Ability to throw things to a specified location
   - [ ] Ability to shoot things from a ranged weapon
 - [ ] Saving and loading

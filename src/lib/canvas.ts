@@ -257,7 +257,7 @@ export class View {
 
     sprite.texture = this._getTexture({ tileSet, char });
     if (tint) sprite.tint = tint;
-    if (alpha) sprite.alpha = alpha;
+    if (typeof alpha !== 'undefined') sprite.alpha = alpha;
 
     return this;
   };

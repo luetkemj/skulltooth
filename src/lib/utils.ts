@@ -6,8 +6,14 @@ import {
   EffectsComponent,
   Entity,
 } from "../engine";
-import { setState, State, removeEAP, addEAP } from "../main";
+import { getState, setState, State, removeEAP, addEAP } from "../main";
 import { Pos } from "./grid";
+
+export const outOfBounds = (pos: Pos) => {
+  const { x, y } = pos;
+  const { width, height } = getState().views.map!;
+  return x < 0 || y < 0 || x >= width || y >= height;
+};
 
 export const updatePosition = (eId: string, position: Pos) => {
   const entity = getEntity(eId);
