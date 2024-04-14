@@ -1,6 +1,7 @@
 import { ComponentTypes, createQuery } from "./engine";
 
 export enum QueryTypes {
+  HasActiveDamages = "hasActiveDamages",
   HasActiveEffects = "hasActiveEffects",
   HasAi = "hasAi",
   HasAppearance = "hasAppearance",
@@ -62,6 +63,12 @@ export const createQueries = () => {
   createQuery(QueryTypes.IsTryingToMove, {
     any: [],
     all: [ComponentTypes.Position, ComponentTypes.TryMove],
+    none: [],
+  });
+
+  createQuery(QueryTypes.HasActiveDamages, {
+    any: [],
+    all: [ComponentTypes.ActiveDamages],
     none: [],
   });
 

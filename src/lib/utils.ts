@@ -5,6 +5,7 @@ import {
   removeComponent,
   EffectsComponent,
   Entity,
+  EId,
 } from "../engine";
 import { getState, setState, State, removeEAP, addEAP } from "../main";
 import { Pos } from "./grid";
@@ -55,7 +56,43 @@ export const addEffectsToEntity = (
   entity: Entity
 ) => {
   // check if entity has activeEffects component
-  if (!entity.components.activeEffects) return
+  if (!entity.components.activeEffects) return;
 
-  entity.components.activeEffects.push(...effects)
+  entity.components.activeEffects.push(...effects);
 };
+
+export const applyDamages = (eId: EId, targetEId: EId) => {
+  const entity = getEntity(eId);
+  const target = getEntity(targetEId);
+  if (!entity || !target) return;
+
+  // get equipped weapon
+  const weaponEId = entity.components.equippedWeapon;
+  if (!weaponEId) return;
+
+  const weapon = getEntity(weaponEId);
+  if (!weapon) return;
+  
+  // get damages component from equpped weapon
+  const damages = weapon.components.damages;
+  if (!damages) return;
+
+  damages.forEach(dmg => dmg.sourceEId = entity.id)
+
+  // apply damages to target
+  // if no active damages component - add one!
+  if (!target.components.activeDamages) {
+    addComponent(target.id, {activeDamages: []})
+  }
+
+  target.components.activeDamages!.push(...damages);
+};
+
+export const equipItem = (eId: EId, targetEId: EId) => {
+  const entity = getEntity(eId);
+  const target = getEntity(targetEId);
+  if (!entity || !target) return;
+
+  // needs to be some logic around - something already being equipped, is item in your inventory etc. But at the moment it's 4:50 am and I'm tired.
+  addComponent(targetEId, { equippedWeapon: eId })
+}

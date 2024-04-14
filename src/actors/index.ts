@@ -4,6 +4,7 @@ import {
   addComponent,
   addPrefabs,
   createEntity,
+  DamageTypes,
 } from "../engine";
 import { addEAP } from "../main";
 import { Pos } from "../lib/grid";
@@ -177,6 +178,13 @@ export const createRock = (wId: WId, position?: Pos) => {
       tileSet: "ascii",
     },
     name: "rock",
+    damages: [
+      {
+        type: DamageTypes.BLUDGEONING,
+        delta: -5,
+        sourceEId: "",
+      },
+    ],
   });
 
   if (position) {

@@ -3,6 +3,7 @@ import { pxToPosId, setupCanvas, View } from "./lib/canvas";
 import "./style.css";
 import { aiSystem } from "./systems/ai.system";
 import { cursorSystem } from "./systems/cursor.system";
+import { damageSystem } from "./systems/damage.system";
 import { effectsSystem } from "./systems/effects.system";
 import { fovSystem } from "./systems/fov.system";
 import { legendSystem } from "./systems/legend.system";
@@ -28,8 +29,10 @@ import {
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
 import { type Pos, toPosId } from "./lib/grid";
+import { addItem } from "./lib/inventory";
 
 import { aStar } from "./lib/pathfinding";
+import { equipItem } from "./lib/utils";
 
 export const enum Turn {
   PLAYER = "PLAYER",
@@ -181,6 +184,10 @@ const init = async () => {
     state.playerEId = player.id;
     state.cursor[1] = player.components.position!;
   });
+
+  const rock = createRock(getState().wId);
+  addItem(rock.id, player.id);
+  equipItem(rock.id, player.id);
 
   dungeon!.rooms.forEach((room, index) => {
     if (index) {
@@ -384,8 +391,10 @@ let fpsSamples: Array<Number> = [];
 function gameLoop() {
   requestAnimationFrame(gameLoop);
 
-
-  if (getState().gameState === GameState.INSPECT || getState().gameState === GameState.TARGET) {
+  if (
+    getState().gameState === GameState.INSPECT ||
+    getState().gameState === GameState.TARGET
+  ) {
     if (getState().userInput && getState().turn === Turn.PLAYER) {
       userInputSystem();
       fovSystem();
@@ -411,6 +420,7 @@ function gameLoop() {
       userInputSystem();
       effectsSystem();
       movementSystem();
+      damageSystem();
       fovSystem();
       legendSystem();
       renderSystem();
@@ -426,6 +436,7 @@ function gameLoop() {
       aiSystem();
       effectsSystem();
       movementSystem();
+      damageSystem();
       fovSystem();
       legendSystem();
       renderSystem();

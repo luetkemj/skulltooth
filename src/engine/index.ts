@@ -1,5 +1,27 @@
 import { cloneDeep, every, some } from "lodash";
 
+export enum DamageTypes {
+  ACID = "Acid",
+  COLD = "Cold",
+  BLUDGEONING = "Bludgeoning",
+  LIGHTNING = "Lightning",
+  PIERCING = "Piercing",
+  FIRE = "Fire",
+  FORCE = "Force",
+  POISON = "Poison",
+  PSYCHIC = "Psychic",
+  RADIANT = "Radiant",
+  NECROSIS = "Necrosis",
+  SLASHING = "Slashing",
+  THUNDER = "Thunder",
+}
+
+type Damage = {
+  type: DamageTypes;
+  delta: number;
+  sourceEId: EId;
+};
+
 type Effect = {
   name: string;
   component: ComponentTypes.Health;
@@ -13,6 +35,10 @@ type AppearanceComponent = {
   tint: number;
   tileSet: string;
 };
+
+export type DamagesComponent = Array<Damage>;
+
+export type ActiveDamagesComponent = Array<Damage>;
 
 export type EffectsComponent = Array<Effect>;
 
@@ -38,10 +64,13 @@ type TryMoveComponent = {
 };
 
 export enum ComponentTypes {
-  ActiveEffects = 'activeEffects',
+  ActiveDamages = "activeDamages",
+  ActiveEffects = "activeEffects",
   Ai = "ai",
   Appearance = "appearance",
-  EffectsComponent = 'effects',
+  Damages = "damages",
+  Effects = "effects",
+  EquippedWeapon = "equippedWeapon",
   Health = "health",
   Inventory = "inventory",
   IsBlocking = "isBlocking",
@@ -59,10 +88,13 @@ export enum ComponentTypes {
 }
 
 export type Components = {
+  activeDamages?: ActiveDamagesComponent;
   activeEffects?: ActiveEffectsComponent;
   ai?: {};
   appearance?: AppearanceComponent;
+  damages?: DamagesComponent;
   effects?: EffectsComponent;
+  equippedWeapon?: EId;
   health?: HealthComponent;
   inventory?: InventoryComponent;
   isBlocking?: {};

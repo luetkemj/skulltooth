@@ -6,7 +6,7 @@ import {
   removeComponent,
 } from "../engine";
 import { toPosId } from "../lib/grid";
-import { updatePosition } from "../lib/utils";
+import { applyDamages, updatePosition } from "../lib/utils";
 import { getState, setState, GameState, type State } from "../main";
 import { addLog, outOfBounds } from "../lib/utils";
 import { QueryTypes } from "../queries";
@@ -65,15 +65,24 @@ const moveEntity = (entity: Entity) => {
   updatePosition(entity.id, { x, y, z });
 };
 
+
 const tryFight = (entity: Entity, target: Entity) => {
   if (!target?.components.health) return;
 
-  target.components.health.current -= 5;
-  addLog(
-    `${entity.components.name} hits ${target.components.name} for 5 damage!`
-  );
+  // pass whatever damages components you have onto target
+  // damages components come from weapon you use to fight
+  // so we need an equipped component
 
-  if (target.components.health.current <= 0) {
+  applyDamages(entity.id, target.id)
+  // target.components.health.current -= 5;
+  // addLog(
+  //   `${entity.components.name} hits ${target.components.name} for 5 damage!`
+  // );
+
+  const targetEntity = getEntity(target.id)
+  if (!targetEntity) return;
+  if (!targetEntity.components.health) return;
+  if (targetEntity.components.health.current <= 0) {
     kill(target, entity);
   }
 };
