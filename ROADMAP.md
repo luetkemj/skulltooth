@@ -27,7 +27,7 @@ This is aspirational only. Expect anything and everything in this document to be
   - [x] Ability to throw things to a specified location
   - [x] Coroner System
   - [x] Damage System
-  - [ ] Disallow throwing on and through walls
+  - [x] Disallow throwing on and through walls
   - [ ] Thrown item cause damage
 - [ ] Saving and loading
 - [ ] Delving into the Dungeon
