@@ -2,6 +2,9 @@ import { mean, sample } from "lodash";
 import { pxToPosId, setupCanvas, View } from "./lib/canvas";
 import "./style.css";
 import { aiSystem } from "./systems/ai.system";
+import { coronerSystem } from "./systems/coroner.system";
+import { cursorSystem } from "./systems/cursor.system";
+import { damageSystem } from "./systems/damage.system";
 import { effectsSystem } from "./systems/effects.system";
 import { fovSystem } from "./systems/fov.system";
 import { legendSystem } from "./systems/legend.system";
@@ -22,14 +25,17 @@ import {
   createPoison,
   createOwlbear,
   createPlayer,
+  createRock,
 } from "./actors";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
-import { toPosId } from "./lib/grid";
+import { type Pos, toPosId } from "./lib/grid";
+import { addItem } from "./lib/inventory";
 
 import { aStar } from "./lib/pathfinding";
+import { equipItem } from "./lib/utils";
 
-const enum Turn {
+export const enum Turn {
   PLAYER = "PLAYER",
   WORLD = "WORLD",
 }
@@ -38,13 +44,27 @@ export const enum GameState {
   GAME = "GAME",
   GAME_OVER = "GAME_OVER",
   INVENTORY = "INVENTORY",
+  INSPECT = "INSPECT",
+  TARGET = "TARGET",
 }
 
 type EAP = { [key: string]: EIds };
 
 export type State = {
+  cursor: [Pos, Pos];
   eAP: EAP;
   fps: number;
+  gameState: GameState;
+  legend: Array<string>;
+  log: Array<string>;
+  playerEId: EId;
+  senses: {
+    feel: string;
+    see: string;
+    hear: string;
+    smell: string;
+    taste: string;
+  };
   toRender: Set<string>;
   turn: Turn;
   userInput: KeyboardEvent | null;
@@ -55,22 +75,12 @@ export type State = {
     senses?: View;
     legend?: View;
     inventory?: View;
-    overlay?: View;
+    menuUnderlay?: View;
     controls?: View;
+    cursor?: View;
   };
   wId: WId;
-  playerEId: EId;
   z: number;
-  gameState: GameState;
-  log: Array<string>;
-  senses: {
-    feel: string;
-    see: string;
-    hear: string;
-    smell: string;
-    taste: string;
-  };
-  legend: Array<string>;
 };
 
 // for debugging
@@ -90,6 +100,10 @@ window.skulltooth.debug = false;
 window.skulltooth.getEntity = (eId: string) => getEntity(eId);
 
 const state: State = {
+  cursor: [
+    { x: 0, y: 0, z: 0 },
+    { x: 0, y: 0, z: 0 },
+  ],
   eAP: {},
   fps: 0,
   toRender: new Set(),
@@ -169,16 +183,26 @@ const init = async () => {
   const player = createPlayer(getState().wId, startingPosition);
   setState((state: State) => {
     state.playerEId = player.id;
+    state.cursor[1] = player.components.position!;
   });
+
+  const rock = createRock(getState().wId);
+  addItem(rock.id, player.id);
+  equipItem(rock.id, player.id);
 
   dungeon!.rooms.forEach((room, index) => {
     if (index) {
-      const creators = [createHealthPotion, createPoison, createOwlbear, createOwlbear]
-      const creator = sample(creators)
+      const creators = [
+        createHealthPotion,
+        createPoison,
+        createOwlbear,
+        createRock,
+      ];
+      const creator = sample(creators);
 
       if (!creator) return;
 
-      creator(getState().wId, room.center)
+      creator(getState().wId, room.center);
     }
   });
 
@@ -287,8 +311,8 @@ const init = async () => {
   });
 
   // MENUS
-  // menu overlay (goes over game view, below menu views)
-  const overlayView = new View({
+  // menu underlay (goes over game view, below menu views)
+  const menuUnderlayView = new View({
     width: 100,
     height: 44,
     x: 0,
@@ -320,7 +344,7 @@ const init = async () => {
     state.views.senses = sensesView;
     state.views.legend = legendView;
     state.views.inventory = inventoryView;
-    state.views.overlay = overlayView;
+    state.views.menuUnderlay = menuUnderlayView;
     state.views.controls = controlsView;
   });
 
@@ -368,6 +392,19 @@ let fpsSamples: Array<Number> = [];
 function gameLoop() {
   requestAnimationFrame(gameLoop);
 
+  if (
+    getState().gameState === GameState.INSPECT ||
+    getState().gameState === GameState.TARGET
+  ) {
+    if (getState().userInput && getState().turn === Turn.PLAYER) {
+      userInputSystem();
+      fovSystem();
+      cursorSystem();
+      legendSystem();
+      renderSystem();
+    }
+  }
+
   if (getState().gameState === GameState.INVENTORY) {
     if (getState().userInput && getState().turn === Turn.PLAYER) {
       userInputSystem();
@@ -384,19 +421,25 @@ function gameLoop() {
       userInputSystem();
       effectsSystem();
       movementSystem();
+      damageSystem();
+      coronerSystem();
       fovSystem();
       legendSystem();
       renderSystem();
 
-      setState((state: State) => {
-        state.turn = Turn.WORLD;
-      });
+      if (getState().gameState === GameState.GAME) {
+        setState((state: State) => {
+          state.turn = Turn.WORLD;
+        });
+      }
     }
 
     if (getState().turn === Turn.WORLD) {
       aiSystem();
       effectsSystem();
       movementSystem();
+      damageSystem();
+      coronerSystem();
       fovSystem();
       legendSystem();
       renderSystem();

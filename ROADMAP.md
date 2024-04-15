@@ -21,11 +21,14 @@ This is aspirational only. Expect anything and everything in this document to be
   - [x] Pickup/Drop controls
   - [x] Healing potion
     - [x] Effects system
-  - [ ] ~~Containers~~
-  - [ ] ~~AI for actors to use own inventory~~
-- [ ] Ranged Weapons and Targeting
-  - [ ] Ability to throw things to a specified location
-  - [ ] Ability to shoot things from a ranged weapon
+- [x] Ranged Weapons and Targeting
+  - [x] Cursor (inspect ui)
+  - [x] Targeting UI (for throwing)
+  - [x] Ability to throw things to a specified location
+  - [x] Coroner System
+  - [x] Damage System
+  - [x] Disallow throwing on and through walls
+  - [x] Thrown item cause damage
 - [ ] Saving and loading
 - [ ] Delving into the Dungeon
 - [ ] Increasing Difficulty
@@ -36,5 +39,10 @@ This is aspirational only. Expect anything and everything in this document to be
 - [ ] Sensory System
 - [ ] Overworld map with multiple dungeons to explore
 - [ ] Crafting
+- [ ] Ability to shoot things from a ranged weapon
 - [ ] color coded logs (ale-dsi/brogue-esque)
   - [ ] support writing mutiple colors to a text row
+
+## Notes
+
+When you consume poison (or health) from the ineventory menu - it takes another turn for the juice to take affect. This is due to when the effects system is run. Is that ok? IDK yet.

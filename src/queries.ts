@@ -1,9 +1,11 @@
 import { ComponentTypes, createQuery } from "./engine";
 
 export enum QueryTypes {
+  HasActiveDamages = "hasActiveDamages",
   HasActiveEffects = "hasActiveEffects",
   HasAi = "hasAi",
   HasAppearance = "hasAppearance",
+  IsAlive = "IsAlive",
   IsInFov = "isInFov",
   IsLegendable = "isLegendable",
   IsOpaque = "isOpaque",
@@ -24,6 +26,12 @@ export const createQueries = () => {
     all: [ComponentTypes.Appearance],
     none: [],
   });
+
+  createQuery(QueryTypes.IsAlive, {
+    any: [],
+    all: [ComponentTypes.Health],
+    none: [ComponentTypes.IsDead],
+  })
 
   createQuery(QueryTypes.IsInFov, {
     any: [ComponentTypes.IsInFov],
@@ -62,6 +70,12 @@ export const createQueries = () => {
   createQuery(QueryTypes.IsTryingToMove, {
     any: [],
     all: [ComponentTypes.Position, ComponentTypes.TryMove],
+    none: [],
+  });
+
+  createQuery(QueryTypes.HasActiveDamages, {
+    any: [],
+    all: [ComponentTypes.ActiveDamages],
     none: [],
   });
 
