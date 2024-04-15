@@ -74,6 +74,7 @@ export enum ComponentTypes {
   Health = "health",
   Inventory = "inventory",
   IsBlocking = "isBlocking",
+  IsDead = 'isDead',
   IsInFov = "isInFov",
   IsOpaque = "isOpaque",
   IsPlayer = "isPlayer",

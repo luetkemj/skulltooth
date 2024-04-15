@@ -5,6 +5,7 @@ export enum QueryTypes {
   HasActiveEffects = "hasActiveEffects",
   HasAi = "hasAi",
   HasAppearance = "hasAppearance",
+  IsAlive = "IsAlive",
   IsInFov = "isInFov",
   IsLegendable = "isLegendable",
   IsOpaque = "isOpaque",
@@ -25,6 +26,12 @@ export const createQueries = () => {
     all: [ComponentTypes.Appearance],
     none: [],
   });
+
+  createQuery(QueryTypes.IsAlive, {
+    any: [],
+    all: [ComponentTypes.Health],
+    none: [ComponentTypes.IsDead],
+  })
 
   createQuery(QueryTypes.IsInFov, {
     any: [ComponentTypes.IsInFov],

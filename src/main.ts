@@ -2,6 +2,7 @@ import { mean, sample } from "lodash";
 import { pxToPosId, setupCanvas, View } from "./lib/canvas";
 import "./style.css";
 import { aiSystem } from "./systems/ai.system";
+import { coronerSystem } from "./systems/coroner.system";
 import { cursorSystem } from "./systems/cursor.system";
 import { damageSystem } from "./systems/damage.system";
 import { effectsSystem } from "./systems/effects.system";
@@ -421,6 +422,7 @@ function gameLoop() {
       effectsSystem();
       movementSystem();
       damageSystem();
+      coronerSystem();
       fovSystem();
       legendSystem();
       renderSystem();
@@ -437,6 +439,7 @@ function gameLoop() {
       effectsSystem();
       movementSystem();
       damageSystem();
+      coronerSystem();
       fovSystem();
       legendSystem();
       renderSystem();

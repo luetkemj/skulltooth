@@ -7,8 +7,8 @@ import {
 } from "../engine";
 import { toPosId } from "../lib/grid";
 import { applyDamages, updatePosition } from "../lib/utils";
-import { getState, setState, GameState, type State } from "../main";
-import { addLog, outOfBounds } from "../lib/utils";
+import { getState, setState, type State } from "../main";
+import { outOfBounds } from "../lib/utils";
 import { QueryTypes } from "../queries";
 
 export const movementSystem = () => {
@@ -65,44 +65,7 @@ const moveEntity = (entity: Entity) => {
   updatePosition(entity.id, { x, y, z });
 };
 
-
 const tryFight = (entity: Entity, target: Entity) => {
   if (!target?.components.health) return;
-
-  // pass whatever damages components you have onto target
-  // damages components come from weapon you use to fight
-  // so we need an equipped component
-
-  applyDamages(entity.id, target.id)
-  // target.components.health.current -= 5;
-  // addLog(
-  //   `${entity.components.name} hits ${target.components.name} for 5 damage!`
-  // );
-
-  const targetEntity = getEntity(target.id)
-  if (!targetEntity) return;
-  if (!targetEntity.components.health) return;
-  if (targetEntity.components.health.current <= 0) {
-    kill(target, entity);
-  }
-};
-
-const kill = (target: Entity, entity: Entity) => {
-  target.components.appearance!.char = "%";
-
-  addLog(
-    `${target.components.name} has been defeated by ${entity.components.name}!`
-  );
-
-  if (target.components.isPlayer) {
-    endGame();
-  }
-
-  removeComponent(target.id, ComponentTypes.Ai);
-  removeComponent(target.id, ComponentTypes.IsBlocking);
-};
-
-const endGame = () => {
-  setState((state: State) => (state.gameState = GameState.GAME_OVER));
-  addLog("Game Over!");
+  applyDamages(entity.id, target.id);
 };
