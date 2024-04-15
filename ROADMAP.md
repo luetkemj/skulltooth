@@ -21,14 +21,14 @@ This is aspirational only. Expect anything and everything in this document to be
   - [x] Pickup/Drop controls
   - [x] Healing potion
     - [x] Effects system
-- [ ] Ranged Weapons and Targeting
+- [x] Ranged Weapons and Targeting
   - [x] Cursor (inspect ui)
   - [x] Targeting UI (for throwing)
   - [x] Ability to throw things to a specified location
   - [x] Coroner System
   - [x] Damage System
   - [x] Disallow throwing on and through walls
-  - [ ] Thrown item cause damage
+  - [x] Thrown item cause damage
 - [ ] Saving and loading
 - [ ] Delving into the Dungeon
 - [ ] Increasing Difficulty
