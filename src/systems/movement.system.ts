@@ -67,5 +67,12 @@ const moveEntity = (entity: Entity) => {
 
 const tryFight = (entity: Entity, target: Entity) => {
   if (!target?.components.health) return;
-  applyDamages(entity.id, target.id);
+
+  const weaponEId = entity.components.equippedWeapon;
+  if (!weaponEId) return;
+
+  const weapon = getEntity(weaponEId);
+  if (!weapon) return;
+
+  applyDamages(weapon.id, target.id);
 };

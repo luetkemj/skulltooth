@@ -10,6 +10,7 @@ import {
   addPosition,
   removePosition,
   updatePosition,
+  applyDamages,
 } from "./utils";
 
 export const addItem = (itemEId: string, containerEId: string) => {
@@ -65,12 +66,16 @@ export const throwItem = (
     if (!blockingEntity && !hasBeenBlocked) {
       finalPos = pos;
     } else {
-      console.log(blockingEntity);
-      console.log(`You hit a ${blockingEntity.components.name}`);
+      // apply damage to entity that has been hit
+      // log stuff
+      if (blockingEntity) {
+        applyDamages(itemEId, blockingEntity.id);
+        console.log(blockingEntity);
+        console.log(`You hit a ${blockingEntity.components.name}`);
+      }
       hasBeenBlocked = true;
     }
   }
-  console.log(finalPos);
   dropItem(itemEId, containerEId);
   updatePosition(itemEId, finalPos);
 

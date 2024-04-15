@@ -66,15 +66,8 @@ export const applyDamages = (eId: EId, targetEId: EId) => {
   const target = getEntity(targetEId);
   if (!entity || !target) return;
 
-  // get equipped weapon
-  const weaponEId = entity.components.equippedWeapon;
-  if (!weaponEId) return;
-
-  const weapon = getEntity(weaponEId);
-  if (!weapon) return;
-
   // get damages component from equpped weapon
-  const damages = weapon.components.damages;
+  const damages = entity.components.damages;
   if (!damages) return;
 
   damages.forEach((dmg) => (dmg.sourceEId = entity.id));
