@@ -42,3 +42,7 @@ This is aspirational only. Expect anything and everything in this document to be
 - [ ] Ability to shoot things from a ranged weapon
 - [ ] color coded logs (ale-dsi/brogue-esque)
   - [ ] support writing mutiple colors to a text row
+
+## Notes
+
+When you consume poison (or health) from the ineventory menu - it takes another turn for the juice to take affect. This is due to when the effects system is run. Is that ok? IDK yet.
