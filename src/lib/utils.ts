@@ -90,17 +90,18 @@ export const equipItem = (eId: EId, targetEId: EId) => {
   addComponent(targetEId, { equippedWeapon: eId });
 };
 
-export const blockingEntitiesAtPos = (pos: Pos) => {
+export const blockingEntitiesAtPos = (pos: Pos): Entity | undefined => {
   const posId = toPosId(pos);
   const eAP = getState().eAP[posId];
-  let blockingEntity
+  let blockingEntity;
   eAP.forEach((eId) => {
-    const entity = getEntity(eId)
+    const entity = getEntity(eId);
     if (!entity) return;
     if (entity.components.isBlocking) {
       blockingEntity = entity;
     }
   });
 
-  return blockingEntity;
+  if (blockingEntity) return blockingEntity;
+  return;
 };

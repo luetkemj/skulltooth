@@ -99,6 +99,7 @@ export type Components = {
   health?: HealthComponent;
   inventory?: InventoryComponent;
   isBlocking?: {};
+  isDead?: {};
   isInFov?: {};
   isOpaque?: {};
   isPlayer?: {};

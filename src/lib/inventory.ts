@@ -11,6 +11,7 @@ import {
   removePosition,
   updatePosition,
   applyDamages,
+  addLog,
 } from "./utils";
 
 export const addItem = (itemEId: string, containerEId: string) => {
@@ -47,6 +48,8 @@ export const throwItem = (
   containerEId: string,
   targetPos: Pos
 ) => {
+  const itemEntity = getEntity(itemEId);
+  if (!itemEntity) return;
   const containerEntity = getEntity(containerEId);
   if (!containerEntity) return;
 
@@ -63,22 +66,15 @@ export const throwItem = (
     if (hasBeenBlocked) break;
 
     const blockingEntity = blockingEntitiesAtPos(pos);
-    if (!blockingEntity && !hasBeenBlocked) {
+    if (!blockingEntity) {
       finalPos = pos;
     } else {
       // apply damage to entity that has been hit
-      // log stuff
-      if (blockingEntity) {
-        applyDamages(itemEId, blockingEntity.id);
-        console.log(blockingEntity);
-        console.log(`You hit a ${blockingEntity.components.name}`);
-      }
+      applyDamages(itemEId, blockingEntity.id);
+      addLog(`${containerEntity.components.name} threw a ${itemEntity.components.name} and hit ${blockingEntity.components.name}`)
       hasBeenBlocked = true;
     }
   }
   dropItem(itemEId, containerEId);
   updatePosition(itemEId, finalPos);
-
-  // need to draw a line to target - hit first blocking item in line - stop at that location.
-  // if it can pass through some things - deal with that too.
 };
