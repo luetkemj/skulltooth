@@ -1,4 +1,5 @@
 // vite.config.js
 export default {
-    base: "/skulltooth/",
+  base: "/skulltooth/",
+  define: { global: "window" },
 };

@@ -35,6 +35,8 @@ import { addItem } from "./lib/inventory";
 import { aStar } from "./lib/pathfinding";
 import { equipItem } from "./lib/utils";
 
+import "./db"
+
 export const enum Turn {
   PLAYER = "PLAYER",
   WORLD = "WORLD",

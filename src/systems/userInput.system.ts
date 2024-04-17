@@ -3,7 +3,7 @@ import { toPosId } from "../lib/grid";
 import { addItem, dropItem, throwItem } from "../lib/inventory";
 import { GameState, Turn, getState, setState, State } from "../main";
 import { QueryTypes } from "../queries";
-import { addLog, addEffectsToEntity, outOfBounds } from "../lib/utils";
+import { addLog, addEffectsToEntity, outOfBounds, saveGame } from "../lib/utils";
 
 const moveKeys = [
   "ArrowLeft",
@@ -32,6 +32,10 @@ export const userInputSystem = () => {
   const { key } = userInput;
 
   if (gameState === GameState.GAME) {
+    if (key === 'S') {
+      saveGame();
+    }
+
     if (key === "i") {
       setState((state: State) => (state.gameState = GameState.INVENTORY));
     }

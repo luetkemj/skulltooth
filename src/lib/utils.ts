@@ -2,6 +2,7 @@ import {
   addComponent,
   ComponentTypes,
   getEntity,
+  getEngineSnapshot,
   removeComponent,
   EffectsComponent,
   Entity,
@@ -105,3 +106,13 @@ export const blockingEntitiesAtPos = (pos: Pos): Entity | undefined => {
   if (blockingEntity) return blockingEntity;
   return;
 };
+
+export const saveGame = () => {
+  // get state and save that 
+  // get worlds and save them (the entire engine)
+
+  // console.log(getEngineSnapshot());
+  console.log(getState())
+
+
+}
