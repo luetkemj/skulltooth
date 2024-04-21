@@ -7,7 +7,7 @@ import {
   rectsIntersect,
   toPosId,
 } from "../lib/grid";
-import { getState } from "../main";
+// import { getState } from "../main";
 import { createFloor, createWall } from "../actors";
 
 type Tile = {
@@ -140,10 +140,10 @@ export const generateDungeon = () => {
 
   for (const tile of tiles) {
     if (tile.sprite === "WALL") {
-      createWall(getState().wId, tile);
+      createWall(tile);
     }
     if (tile.sprite === "FLOOR") {
-      createFloor(getState().wId, tile);
+      createFloor(tile);
     }
   }
 

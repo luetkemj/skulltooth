@@ -1,6 +1,6 @@
 import { World } from "miniplex";
 
-type EId = number;
+export type EId = number;
 
 export enum DamageTypes {
   ACID = "Acid",
@@ -37,15 +37,15 @@ type Effect = {
 export type Entity = {
   activeDamages?: Array<Damage>;
   activeEffects?: Array<Effect>;
-  ai?: false;
+  ai?: boolean;
   appearance?: {
     char: string;
     tint: number;
     tileSet: string;
   };
-  blocking?: false;
+  blocking?: boolean;
   damages?: Array<Damage>;
-  dead?: false;
+  dead?: boolean;
   effects?: Array<Effect>;
   equippedWeapon?: EId;
   health?: {
@@ -53,15 +53,15 @@ export type Entity = {
     current: number;
   };
   inventory?: Array<EId>;
-  inFov?: false;
+  inFov?: true;
   layer?: Number;
-  legendable?: false;
-  opaque?: false;
-  player?: false;
-  revealed?: false;
+  legendable?: boolean;
+  isOpaque?: true;
+  isPlayer?: boolean;
+  revealed?: boolean;
   name?: String;
-  pathThrough?: false;
-  pickup?: false;
+  pathThrough?: boolean;
+  pickup?: boolean;
   position?: {
     x: number;
     y: number;
@@ -76,3 +76,13 @@ export type Entity = {
 
 export const world = new World<Entity>();
 
+// const entity = world.add({ position: { x: 0, y: 0, z: 0 } });
+//
+// world.addComponent(entity, "velocity", { x: 10, y: 0, z: 0 });
+//
+// // const id = world.id(entity)
+//
+// // console.log(id)
+// console.log(entity);
+// console.log(world);
+//

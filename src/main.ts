@@ -1,39 +1,41 @@
+import "./engine/engine";
+
 import { mean, sample } from "lodash";
 import { pxToPosId, setupCanvas, View } from "./lib/canvas";
 import "./style.css";
-import { aiSystem } from "./systems/ai.system";
-import { coronerSystem } from "./systems/coroner.system";
-import { cursorSystem } from "./systems/cursor.system";
-import { damageSystem } from "./systems/damage.system";
-import { effectsSystem } from "./systems/effects.system";
+// import { aiSystem } from "./systems/ai.system";
+// import { coronerSystem } from "./systems/coroner.system";
+// import { cursorSystem } from "./systems/cursor.system";
+// import { damageSystem } from "./systems/damage.system";
+// import { effectsSystem } from "./systems/effects.system";
 import { fovSystem } from "./systems/fov.system";
-import { legendSystem } from "./systems/legend.system";
-import { movementSystem } from "./systems/movement.system";
+// import { legendSystem } from "./systems/legend.system";
+// import { movementSystem } from "./systems/movement.system";
 import { renderSystem } from "./systems/render.system";
-import { userInputSystem } from "./systems/userInput.system";
+// import { userInputSystem } from "./systems/userInput.system";
 import {
   type WId,
-  type EId,
-  type EIds,
-  type Entity,
+  // type EId,
+  // type EIds,
   createWorld,
   getEngine,
   getEntity,
 } from "./engine";
+import { world, EId, Entity } from "./engine/engine";
 import {
-  createHealthPotion,
-  createPoison,
-  createOwlbear,
+  // createHealthPotion,
+  // createPoison,
+  // createOwlbear,
   createPlayer,
-  createRock,
+  // createRock,
 } from "./actors";
 import { createQueries } from "./queries";
 import { generateDungeon } from "./pcgn/dungeon";
 import { type Pos, toPosId } from "./lib/grid";
-import { addItem } from "./lib/inventory";
+// import { addItem } from "./lib/inventory";
 
 import { aStar } from "./lib/pathfinding";
-import { equipItem } from "./lib/utils";
+// import { equipItem } from "./lib/utils";
 
 export const enum Turn {
   PLAYER = "PLAYER",
@@ -48,7 +50,7 @@ export const enum GameState {
   TARGET = "TARGET",
 }
 
-type EAP = { [key: string]: EIds };
+type EAP = { [key: string]: Set<EId> };
 
 export type State = {
   cursor: [Pos, Pos];
@@ -111,7 +113,7 @@ const state: State = {
   userInput: null,
   views: {},
   wId: "",
-  playerEId: "",
+  playerEId: 0,
   z: 0,
   gameState: GameState.GAME,
   log: [
@@ -140,13 +142,16 @@ export const setState = (callback: Function): void => {
 export const getState = (): State => state;
 
 export const addEAP = (entity: Entity): State => {
-  if (entity.components.position) {
-    const posId = toPosId(entity.components.position);
+  const eId = world.id(entity)
+  if (!eId) return state;
+
+  if (entity.position) {
+    const posId = toPosId(entity.position);
     if (state.eAP[posId]) {
-      state.eAP[posId].add(entity.id);
+      state.eAP[posId].add(eId);
     } else {
       state.eAP[posId] = new Set();
-      state.eAP[posId].add(entity.id);
+      state.eAP[posId].add(eId);
     }
 
     state.toRender.add(posId);
@@ -156,10 +161,13 @@ export const addEAP = (entity: Entity): State => {
 };
 
 export const removeEAP = (entity: Entity): State => {
-  if (entity.components.position) {
-    const posId = toPosId(entity.components.position);
+  const eId = world.id(entity)
+  if (!eId) return state;
+
+  if (entity.position) {
+    const posId = toPosId(entity.position);
     if (state.eAP[posId]) {
-      state.eAP[posId].delete(entity.id);
+      state.eAP[posId].delete(eId);
     }
     state.toRender.add(posId);
   }
@@ -170,41 +178,44 @@ export const removeEAP = (entity: Entity): State => {
 const init = async () => {
   await setupCanvas(document.querySelector<HTMLCanvasElement>("#canvas")!);
 
-  const world = createWorld();
+  const oldWorld = createWorld();
 
   setState((state: State) => {
-    state.wId = world.id;
+    state.wId = oldWorld.id;
   });
 
   createQueries();
   const dungeon = generateDungeon();
   const startingPosition = dungeon!.rooms[0].center;
-
-  const player = createPlayer(getState().wId, startingPosition);
+  //
+  const player = createPlayer(startingPosition);
   setState((state: State) => {
-    state.playerEId = player.id;
-    state.cursor[1] = player.components.position!;
+    const playerEId = world.id(player)
+    if (!playerEId) return;
+
+    state.playerEId = playerEId;
+    state.cursor[1] = player.position!;
   });
+  //
+  // const rock = createRock(getState().wId);
+  // addItem(rock.id, player.id);
+  // equipItem(rock.id, player.id);
 
-  const rock = createRock(getState().wId);
-  addItem(rock.id, player.id);
-  equipItem(rock.id, player.id);
-
-  dungeon!.rooms.forEach((room, index) => {
-    if (index) {
-      const creators = [
-        createHealthPotion,
-        createPoison,
-        createOwlbear,
-        createRock,
-      ];
-      const creator = sample(creators);
-
-      if (!creator) return;
-
-      creator(getState().wId, room.center);
-    }
-  });
+  // dungeon!.rooms.forEach((room, index) => {
+  //   if (index) {
+  //     const creators = [
+  //       createHealthPotion,
+  //       createPoison,
+  //       createOwlbear,
+  //       createRock,
+  //     ];
+  //     const creator = sample(creators);
+  //
+  //     if (!creator) return;
+  //
+  //     creator(getState().wId, room.center);
+  //   }
+  // });
 
   new View({
     width: 12,
@@ -355,7 +366,7 @@ const init = async () => {
   // initialize some systems at game start
   {
     fovSystem();
-    legendSystem();
+    // legendSystem();
     renderSystem();
   }
 
@@ -379,7 +390,7 @@ const init = async () => {
 
     if (window.skulltooth.debug === true || import.meta.env.DEV) {
       state.eAP[posId].forEach((eId) => {
-        console.log(getEntity(eId));
+        console.log(world.entity(eId));
       });
     }
   });
@@ -397,20 +408,20 @@ function gameLoop() {
     getState().gameState === GameState.TARGET
   ) {
     if (getState().userInput && getState().turn === Turn.PLAYER) {
-      userInputSystem();
-      fovSystem();
-      cursorSystem();
-      legendSystem();
+      // userInputSystem();
+      // fovSystem();
+      // cursorSystem();
+      // legendSystem();
       renderSystem();
     }
   }
 
   if (getState().gameState === GameState.INVENTORY) {
     if (getState().userInput && getState().turn === Turn.PLAYER) {
-      userInputSystem();
-      effectsSystem();
-      fovSystem();
-      legendSystem();
+      // userInputSystem();
+      // effectsSystem();
+      // fovSystem();
+      // legendSystem();
       renderSystem();
     }
   }
@@ -418,14 +429,14 @@ function gameLoop() {
   if (getState().gameState === GameState.GAME) {
     // systems
     if (getState().userInput && getState().turn === Turn.PLAYER) {
-      userInputSystem();
-      effectsSystem();
-      movementSystem();
-      damageSystem();
-      coronerSystem();
-      fovSystem();
-      legendSystem();
-      renderSystem();
+      // userInputSystem();
+      // effectsSystem();
+      // movementSystem();
+      // damageSystem();
+      // coronerSystem();
+      // fovSystem();
+      // legendSystem();
+      // renderSystem();
 
       if (getState().gameState === GameState.GAME) {
         setState((state: State) => {
@@ -435,14 +446,14 @@ function gameLoop() {
     }
 
     if (getState().turn === Turn.WORLD) {
-      aiSystem();
-      effectsSystem();
-      movementSystem();
-      damageSystem();
-      coronerSystem();
-      fovSystem();
-      legendSystem();
-      renderSystem();
+      // aiSystem();
+      // effectsSystem();
+      // movementSystem();
+      // damageSystem();
+      // coronerSystem();
+      // fovSystem();
+      // legendSystem();
+      // renderSystem();
 
       setState((state: State) => {
         state.turn = Turn.PLAYER;

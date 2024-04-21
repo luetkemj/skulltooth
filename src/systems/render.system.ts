@@ -1,6 +1,7 @@
 import { sortBy } from "lodash";
 import { State, getState, setState, GameState } from "../main";
-import { getEntity, getQuery } from "../engine";
+// import { getEntity, getQuery } from "../engine";
+import { world } from "../engine/engine";
 import { QueryTypes } from "../queries";
 import { UpdateRow } from "../lib/canvas";
 
@@ -29,7 +30,7 @@ const getAlpha = (index: number) => {
 };
 
 export const renderSystem = () => {
-  const isPlayerQuery = getQuery(QueryTypes.IsPlayer);
+  // const isPlayerQuery = getQuery(QueryTypes.IsPlayer);
 
   const {
     map: mapView,
@@ -47,7 +48,7 @@ export const renderSystem = () => {
       // sort entities at eap into a stack
       const entities = [];
       for (const eId of eAP) {
-        const entity = getEntity(eId);
+        const entity = world.entity(eId);
         if (!entity) return;
         entities.push(entity);
       }
@@ -57,10 +58,10 @@ export const renderSystem = () => {
       // only render top item on stack
       const entity = sortedEntities[sortedEntities.length - 1];
 
-      const { char, tint } = entity.components.appearance!;
-      const { x, y } = entity.components.position!;
+      const { char, tint } = entity.appearance!;
+      const { x, y } = entity.position!;
       // if entity has been revealed - render accordingly
-      if (entity.components.isRevealed) {
+      if (entity.revealed) {
         mapView?.updateCell({
           0: { char, tint: 0x000001, alpha: 0, tileSet: "tile", x, y },
           1: { char, tint, alpha: 0.35, tileSet: "ascii", x, y },
@@ -68,12 +69,19 @@ export const renderSystem = () => {
       }
 
       // if entity is in fov - render accordingly
-      if (entity.components.isInFov) {
+      if (entity.inFov) {
         mapView?.updateCell({
           0: { char, tint: 0x111111, alpha: 0, tileSet: "tile", x, y },
           1: { char, tint, alpha: 1, tileSet: "ascii", x, y },
         });
       }
+
+      // debugging - just render is all
+      mapView?.updateCell({
+        0: { char, tint: 0x111111, alpha: 0, tileSet: "tile", x, y },
+        1: { char, tint, alpha: 1, tileSet: "ascii", x, y },
+      });
+      // end debugging
     }
   }
 

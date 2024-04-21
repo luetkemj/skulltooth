@@ -1,4 +1,4 @@
-import {  type Query, type EIds, getEntity } from "../engine";
+import { type Query, type EIds, getEntity } from "../engine";
 import { type Pos } from "./grid";
 
 type Transform = {
@@ -20,7 +20,7 @@ const octantTransforms = [
 ];
 
 export default function createFOV(
-  opaqueQuery: Query,
+  opaqueEntities,
   width: number,
   height: number,
   pos: Pos,
@@ -32,15 +32,23 @@ export default function createFOV(
 
   const blockingLocations = new Set();
 
-  opaqueQuery.entities.forEach((eId) => {
-    const entity = getEntity(eId);
-    if (entity) {
-      const pos = entity.components.position;
-      if (pos!.z === originZ) {
-        blockingLocations.add(`${pos!.x},${pos!.y},${pos!.z}`);
-      }
+  console.log(opaqueEntities)
+
+  for (const entity of opaqueEntities) {
+    const pos = entity.position;
+    if (pos!.z === originZ) {
+      blockingLocations.add(`${pos!.x},${pos!.y},${pos!.z}`);
     }
-  });
+  }
+  // opaqueQuery.entities.forEach((eId) => {
+  //   const entity = getEntity(eId);
+  //   if (entity) {
+  //     const pos = entity.components.position;
+  //     if (pos!.z === originZ) {
+  //       blockingLocations.add(`${pos!.x},${pos!.y},${pos!.z}`);
+  //     }
+  //   }
+  // });
 
   const isOpaque = (x: number, y: number) => {
     const locId = `${x},${y},${originZ}`;
